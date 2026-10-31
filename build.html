@@ -26,7 +26,7 @@
   </div>
 </main>
 <div class="sticky-bar"><div class="wrap">
-  <div><div class="sub">Projected total (2026 NQS, else avg; NEW = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/20</span></div></div>
+  <div><div class="sub">Projected total (2026 NQS; no projection = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/20</span></div></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn small" id="clear">Clear</button>
     <a class="btn primary" id="submit" href="#" aria-disabled="true">Submit with GitHub</a>
@@ -87,7 +87,7 @@ FF.chrome('build.html');
         const g = id && G._byId[id];
         if (!g) return `<button class="slot" data-ev="${ev}" data-i="${i}"><span class="nm muted">+ Pick slot ${i + 1}</span></button>`;
         const p = FF.proj(g, ev); sub += p || 0; n++;
-        return `<div class="slot filled" data-ev="${ev}" data-i="${i}" role="button" tabindex="0"><span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? '<span class="pill new">NEW</span>' : FF.f3(p)}</span><button class="x" data-x="${ev}:${i}" aria-label="Remove">×</button></div>`;
+        return `<div class="slot filled" data-ev="${ev}" data-i="${i}" role="button" tabindex="0"><span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? FF.noProj(g) : FF.f3(p)}</span><button class="x" data-x="${ev}:${i}" aria-label="Remove">×</button></div>`;
       }).join('');
       tot += sub;
       return `<section class="evcol"><h3><span>${FF.EV_NAME[ev]}</span><span class="num muted">${sub.toFixed(3)}</span></h3>${slots}</section>`;
@@ -125,7 +125,7 @@ FF.chrome('build.html');
     const taken = new Set(L[ev].filter(Boolean));
     let rows = G.gymnasts.filter(g => (!team || g.team_id === team) && (!q || (g.name + ' ' + g.team).toLowerCase().includes(q)));
     rows.sort((a, b) => (FF.proj(b, ev) ?? -1) - (FF.proj(a, ev) ?? -1) || a.name.localeCompare(b.name));
-    $('plist').innerHTML = rows.slice(0, 200).map(g => { const p = g.proj?.[ev]; return `<button class="row" data-id="${FF.esc(g.id)}" ${taken.has(g.id) ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}</span></span><span class="num sub">${p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)}` : '<span class="pill new">NEW</span>'}</span></button>`; }).join('') + (rows.length > 200 ? `<div class="sub" style="padding:10px">${rows.length - 200} more. Search to narrow.</div>` : '');
+    $('plist').innerHTML = rows.slice(0, 200).map(g => { const p = g.proj?.[ev]; return `<button class="row" data-id="${FF.esc(g.id)}" ${taken.has(g.id) ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}</span></span><span class="num sub">${p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)}` : FF.noProj(g)}</span></button>`; }).join('') + (rows.length > 200 ? `<div class="sub" style="padding:10px">${rows.length - 200} more. Search to narrow.</div>` : '');
   }
   $('pq').addEventListener('input', plist); $('pteam').addEventListener('input', plist);
   $('plist').addEventListener('click', e => { const r = e.target.closest('.row'); if (!r || r.disabled) return; L[cur.ev][cur.i] = r.dataset.id; save(); render(); $('picker').close(); });

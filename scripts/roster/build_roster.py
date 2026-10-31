@@ -63,6 +63,8 @@ for t in teams:
         gid = str(g['id'])
         rtn26[gid] = {'gid': gid, 'first': g['fname'].strip(), 'last': g['lname'].strip(), 'team': t['name'], 'tid': t['tid'],
                       'year': g.get('school_year'), 'events': [ev for ev in EVENTS if g.get(EVFLAG[ev])], 'hometown': g.get('hometown')}
+rank_by_name = defaultdict(list)
+for r in rank_rows.values(): rank_by_name[norm(r['fname'] + ' ' + r['lname'])].append(r)
 by_team26 = defaultdict(list)
 for p in rtn26.values(): by_team26[p['tid']].append(p)
 name26 = defaultdict(list)
@@ -76,6 +78,10 @@ def match(first, last, tid):
     if same: return same[0], 'exact-team'
     cand = name26.get(full, [])
     if len(cand) == 1: return cand[0], 'exact-transfer'
+    rk = rank_by_name.get(full, [])
+    if len(rk) == 1:   # in the 2026 event rankings but not on a D1 RTN roster (e.g. a D2/D3 transfer)
+        r = rk[0]
+        return {'gid': str(r['gid']), 'first': r['fname'], 'last': r['lname'], 'team': r['team'], 'tid': r['tid'], 'year': None, 'events': [], 'hometown': None}, 'exact-ranking'
     # same team, same last name, first name prefix (Lexi/Alexis is not handled; Kate/Katherine prefix is)
     ln = [p for p in by_team26.get(tid, []) if norm(p['last']) == norm(last)]
     f1 = norm(first)

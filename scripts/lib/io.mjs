@@ -19,6 +19,6 @@ export function parseArgs(argv = process.argv.slice(2)) {
 export async function loadSeason(id) {
   const main = await readJson(join(DATA, 'season.json'));
   if (String(id) === String(main.season)) return main;
-  if (main.demo && String(id) === String(main.demo.season)) return readJson(join(DATA, main.demo.file));
+  if (main.demo && String(id) === String(main.demo.season)) return readJson(join(ROOT, main.demo.file));
   throw new Error(`Unknown season ${id}`);
 }

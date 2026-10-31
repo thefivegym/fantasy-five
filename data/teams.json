@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-31T17:49:54Z",
+ "generated_at": "2026-10-31T18:13:41Z",
  "source": "RTN D1 team list (2026 final rankings, div = \"Div I\") + official roster pages",
  "teams": [
   {
@@ -27,7 +27,7 @@
    "roster_url": "https://rolltide.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 28,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -59,7 +59,7 @@
    "roster_url": "https://arizonawildcats.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 26,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -123,7 +123,7 @@
    "roster_url": "https://ballstatesports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 22,
+   "roster_count": 19,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -139,7 +139,7 @@
    "roster_url": "https://broncosports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 25,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -155,7 +155,7 @@
    "roster_url": "https://bgsufalcons.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 24,
+   "roster_count": 17,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -171,7 +171,7 @@
    "roster_url": "https://brownbears.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 25,
+   "roster_count": 19,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -203,7 +203,7 @@
    "roster_url": "https://calbears.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 28,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 1,
@@ -219,7 +219,7 @@
    "roster_url": "https://cmuchippewas.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 24,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -267,7 +267,7 @@
    "roster_url": "https://denverpioneers.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 23,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -283,7 +283,7 @@
    "roster_url": "https://emueagles.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 25,
+   "roster_count": 22,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -299,7 +299,7 @@
    "roster_url": "https://floridagators.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 33,
+   "roster_count": 15,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -315,7 +315,7 @@
    "roster_url": "https://gwsports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 23,
+   "roster_count": 16,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -331,7 +331,7 @@
    "roster_url": "https://georgiadogs.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 33,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -347,7 +347,7 @@
    "roster_url": "https://fightingillini.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 25,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
@@ -394,12 +394,12 @@
    "conference": "Big 12",
    "roster_url": "https://cyclones.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
-   "roster_status": "official-2026-27",
-   "roster_count": 18,
-   "note": null,
+   "roster_status": "provisional-rtn-2026",
+   "roster_count": 17,
+   "note": "Official roster page still shows 2025-26; using the 2026 RTN roster minus 2026 seniors/graduate students. No 2026-27 freshmen or incoming transfers.",
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 17,
+    "advanced_one_year": 1
    }
   },
   {
@@ -411,11 +411,11 @@
    "roster_url": "https://kentstatesports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 30,
+   "roster_count": 22,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 16
    }
   },
   {
@@ -431,7 +431,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 14
    }
   },
   {
@@ -442,12 +442,12 @@
    "conference": "EAGL",
    "roster_url": "https://www.liuathletics.com/sports/womens-gymnastics/roster",
    "roster_source": "classic",
-   "roster_status": "official-2026-27",
-   "roster_count": 20,
-   "note": null,
+   "roster_status": "provisional-rtn-2026",
+   "roster_count": 14,
+   "note": "Official roster page still shows 2025-26; using the 2026 RTN roster minus 2026 seniors/graduate students. No 2026-27 freshmen or incoming transfers.",
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 19,
+    "advanced_one_year": 1
    }
   },
   {
@@ -475,11 +475,11 @@
    "roster_url": "https://umterps.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 46,
+   "roster_count": 23,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -495,7 +495,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 13
    }
   },
   {
@@ -507,11 +507,11 @@
    "roster_url": "https://msuspartans.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 27,
+   "roster_count": 19,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 10
    }
   },
   {
@@ -523,11 +523,11 @@
    "roster_url": "https://gophersports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 24,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 11
    }
   },
   {
@@ -543,7 +543,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 11
    }
   },
   {
@@ -559,7 +559,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 7
    }
   },
   {
@@ -571,11 +571,11 @@
    "roster_url": "https://unhwildcats.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 33,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -587,11 +587,11 @@
    "roster_url": "https://goheels.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 21,
+   "roster_count": 16,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -603,11 +603,11 @@
    "roster_url": "https://gopack.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 34,
+   "roster_count": 21,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 16
    }
   },
   {
@@ -623,7 +623,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 16
    }
   },
   {
@@ -635,11 +635,11 @@
    "roster_url": "https://ohiostatebuckeyes.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 26,
+   "roster_count": 20,
    "note": null,
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 1,
+    "advanced_one_year": 14
    }
   },
   {
@@ -651,11 +651,11 @@
    "roster_url": "https://soonersports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 31,
+   "roster_count": 21,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 14
    }
   },
   {
@@ -667,11 +667,11 @@
    "roster_url": "https://osubeavers.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 26,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -686,8 +686,8 @@
    "roster_count": 16,
    "note": null,
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 1,
+    "advanced_one_year": 12
    }
   },
   {
@@ -703,7 +703,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 16
    }
   },
   {
@@ -715,11 +715,11 @@
    "roster_url": "https://pittsburghpanthers.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 22,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 1,
+    "advanced_one_year": 10
    }
   },
   {
@@ -731,11 +731,11 @@
    "roster_url": "https://scarletknights.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 34,
+   "roster_count": 21,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 16
    }
   },
   {
@@ -747,11 +747,11 @@
    "roster_url": "https://semoredhawks.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 22,
+   "roster_count": 18,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 11
    }
   },
   {
@@ -767,7 +767,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 11
    }
   },
   {
@@ -783,7 +783,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 13
    }
   },
   {
@@ -799,7 +799,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 17
    }
   },
   {
@@ -815,7 +815,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -827,11 +827,11 @@
    "roster_url": "https://owlsports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 35,
+   "roster_count": 24,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 18
    }
   },
   {
@@ -847,7 +847,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 10
    }
   },
   {
@@ -863,7 +863,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 12
    }
   },
   {
@@ -879,7 +879,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 13
    }
   },
   {
@@ -891,11 +891,11 @@
    "roster_url": "https://utahutes.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 22,
+   "roster_count": 15,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 11
    }
   },
   {
@@ -911,7 +911,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 13
    }
   },
   {
@@ -927,7 +927,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 13
    }
   },
   {
@@ -939,11 +939,11 @@
    "roster_url": "https://wvusports.com/sports/womens-gymnastics/roster",
    "roster_source": "nuxt-sidearm",
    "roster_status": "official-2026-27",
-   "roster_count": 35,
+   "roster_count": 21,
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 15
    }
   },
   {
@@ -959,7 +959,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 17
    }
   },
   {
@@ -975,7 +975,7 @@
    "note": null,
    "stale_check": {
     "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "advanced_one_year": 14
    }
   },
   {
@@ -990,8 +990,8 @@
    "roster_count": 19,
    "note": null,
    "stale_check": {
-    "same_class_as_2026": 0,
-    "advanced_one_year": 0
+    "same_class_as_2026": 1,
+    "advanced_one_year": 13
    }
   }
  ]
