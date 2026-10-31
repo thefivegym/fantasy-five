@@ -20,7 +20,8 @@ const strategies = {
   'DEMO-next-five': ev => pool(ev, g => playing.has(g.team)).slice(5, 10),
   'DEMO-mid-major': ev => pool(ev, g => playing.has(g.team) && !POWER.has(conf[g.team])).slice(0, 5),
   'DEMO-ceiling': ev => pool(ev, g => playing.has(g.team)).slice(20).sort((a, b) => (b.proj[ev].high ?? 0) - (a.proj[ev].high ?? 0) || nqs(b, ev) - nqs(a, ev)).slice(0, 5),
-  'DEMO-no-schedule-check': ev => pool(ev).slice(0, 5),   // ignores byes: shows the DNC = 0 rule
+  // chalk, but the 5th slot goes to the best gymnast whose team had a bye: shows the DNC = 0 rule
+  'DEMO-bye-week': ev => [...pool(ev, g => playing.has(g.team)).slice(0, 4), pool(ev, g => !playing.has(g.team))[0]],
 };
 for (const [login, pick] of Object.entries(strategies)) {
   const lineup = Object.fromEntries(EVENTS.map(ev => [ev, pick(ev).map(g => g.id)]));

@@ -93,7 +93,7 @@ index.html roster.html build.html leaderboard.html player.html card.html   site 
 assets/style.css assets/common.js                                          shared style + helpers
 scripts/lib/{config,scoring,io,names}.mjs                                  game constants + scoring engine
 scripts/process-lineup.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
-scripts/seed-demo.mjs                                                       builds the DEMO lineups
+scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups (2026 RTN rankings + week schedule only)
 scripts/test/scoring.test.mjs                                               node --test scripts/test/*.test.mjs
 scripts/roster/                                                             offline roster builder
 .github/workflows/{lineup,score,deploy}.yml   .github/ISSUE_TEMPLATE/lineup.md
