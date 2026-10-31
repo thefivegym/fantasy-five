@@ -1,0 +1,50 @@
+name: Lineup submission
+on:
+  issues:
+    types: [opened, edited]
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+jobs:
+  lineup:
+    if: contains(github.event.issue.labels.*.name, 'lineup') || startsWith(github.event.issue.title, 'Lineup:')
+    runs-on: ubuntu-latest
+    outputs:
+      accepted: ${{ steps.p.outputs.accepted }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - id: p
+        run: node scripts/process-lineup.mjs
+      - name: Commit lineup
+        if: steps.p.outputs.accepted == 'true'
+        env:
+          LINEUP_PATH: ${{ steps.p.outputs.path }}
+          ISSUE: ${{ github.event.issue.number }}
+          LOGIN: ${{ github.event.issue.user.login }}
+        run: |
+          git config user.name "fantasy-five-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$LINEUP_PATH"
+          if git diff --cached --quiet; then echo "No change"; exit 0; fi
+          git commit -m "Lineup: $LOGIN (#$ISSUE)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
+      - name: Comment and close
+        if: always() && steps.p.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          ACCEPTED: ${{ steps.p.outputs.accepted }}
+        run: |
+          gh issue edit "$ISSUE" --add-label lineup || true
+          gh issue comment "$ISSUE" --body-file lineup-comment.md
+          if [ "$ACCEPTED" = "true" ]; then gh issue close "$ISSUE" --reason completed; else gh issue close "$ISSUE" --reason "not planned"; fi
+  deploy:
+    needs: lineup
+    if: needs.lineup.outputs.accepted == 'true'
+    uses: ./.github/workflows/deploy.yml

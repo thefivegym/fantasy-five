@@ -1,0 +1,10 @@
+{
+ "season": "test", "week": 1, "status": "final",
+ "scores": {
+  "a": { "vault": [{ "score": 9.9, "meet_id": 1 }, { "score": 9.95, "meet_id": 2 }], "floor": [{ "score": 9.85, "meet_id": 1 }] },
+  "b": { "vault": [{ "score": 9.8, "meet_id": 1 }], "bars": [{ "score": 9.9, "meet_id": 1 }] },
+  "c": { "beam": [{ "score": 9.7, "meet_id": 1 }, { "score": 9.9, "meet_id": 3 }] },
+  "d": { "vault": [{ "score": 9.75, "meet_id": 1 }] },
+  "e": { "vault": [{ "score": 9.7, "meet_id": 1 }] }
+ }
+}

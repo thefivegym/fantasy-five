@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Player — Fantasy Five</title>
+<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta property="og:title" content="Player — Fantasy Five">
+<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta name="twitter:site" content="@thefivethatscore">
+<meta name="theme-color" content="#14112b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h2 id="title">Player</h2>
+  <div class="card" id="summary"></div>
+  <div id="weeks"></div>
+</main>
+<script>
+FF.chrome('');
+(async () => {
+  const $ = id => document.getElementById(id);
+  const u = FF.q.get('u');
+  const s = await FF.season();
+  FF.demoBanner(s, $('banner'));
+  if (!u) { $('title').textContent = 'Player'; $('summary').innerHTML = '<p>Add <code>?u=github-login</code> to the URL, or pick a player from the <a href="leaderboard.html">leaderboard</a>.</p>'; return; }
+  const sid = String(s.season);
+  const lb = await FF.json(`data/leaderboard/${sid}.json`, { weeks: [], players: [] });
+  const me = lb.players.find(p => p.login.toLowerCase() === u.toLowerCase());
+  $('title').innerHTML = `${FF.esc(me?.login || u)} ${FF.isDemo(s) ? '<span class="demo-tag">DEMO</span>' : ''}`;
+  document.title = `${me?.login || u} — Fantasy Five`;
+  const gh = FF.isDemoLogin(u) ? '<span class="sub">Sample DEMO player, not a GitHub account.</span>' : `<a href="https://github.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">github.com/${FF.esc(u)}</a>`;
+  if (!me) { $('summary').innerHTML = `<p>No scored weeks for ${FF.esc(u)} in ${FF.isDemo(s) ? 'the DEMO' : sid}. ${gh}</p>`; return; }
+  $('summary').innerHTML = `<div class="kpi"><div><div class="sub">Season total</div><div class="big">${FF.fTot(me.total)}</div></div><div><div class="sub">Season rank</div><div class="big">${me.rank}<span class="sub"> / ${lb.players.length}</span></div></div><div><div class="sub">Best week</div><div class="big">${FF.fTot(me.best_week?.total)}</div></div></div><p>${gh}</p>`;
+  const rows = [];
+  for (const wk of lb.weeks) {
+    const wr = await FF.json(`data/results/${sid}/${wk}.json`);
+    const p = wr.players.find(x => x.login === me.login);
+    if (p) rows.push({ wk, wr, p, w: s.weeks.find(x => x.week === wk) });
+  }
+  $('weeks').innerHTML = `<div class="card tscroll"><h3>Weekly history</h3><table class="t"><thead><tr><th>Week</th>${FF.EVENTS.map(e => `<th class="n">${FF.EV_SHORT[e]}</th>`).join('')}<th class="n">Total</th><th class="n">Rank</th><th></th></tr></thead><tbody>${rows.map(r => `<tr><td>${FF.esc(r.w?.label || 'Week ' + r.wk)}</td>${FF.EVENTS.map(e => `<td class="n">${FF.f3(r.p.events[e].total)}</td>`).join('')}<td class="n"><b>${FF.fTot(r.p.total)}</b></td><td class="n">${r.p.rank}/${r.wr.players.length}</td><td><a class="btn small" href="${FF.cardUrl(me.login, r.wk, s)}">Card</a></td></tr>`).join('')}</tbody></table></div>`
+    + rows.slice().reverse().map(r => `<div class="card"><h3>${FF.esc(r.w?.label || 'Week ' + r.wk)} · ${FF.fTot(r.p.total)}</h3><div class="board">${FF.EVENTS.map(e => `<div><div class="sub"><b>${FF.EV_NAME[e]}</b> · ${FF.f3(r.p.events[e].total)}</div><table class="t">${r.p.events[e].slots.map(sl => `<tr><td>${FF.esc(sl.name)}<div class="sub">${FF.esc(sl.team || '')}</div></td><td class="n">${sl.competed ? FF.f3(sl.score) : '<span class="pill zero">DNC 0</span>'}</td></tr>`).join('')}</table></div>`).join('')}</div></div>`).join('');
+})().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load data: ' + e.message; });
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Result card — Fantasy Five</title>
+<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta property="og:title" content="Result card — Fantasy Five">
+<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta name="twitter:site" content="@thefivethatscore">
+<meta name="theme-color" content="#14112b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h2 id="title">Result card</h2>
+  <canvas id="c" class="cardcanvas" width="1080" height="1350" aria-label="Result card"></canvas>
+  <p class="links" style="margin-top:10px"><button class="btn primary" id="dl">Download PNG</button><a class="btn" id="back" href="leaderboard.html">Leaderboard</a></p>
+  <p class="sub">1080×1350 PNG. Built in your browser from the published results JSON.</p>
+</main>
+<script>
+FF.chrome('');
+(async () => {
+  const $ = id => document.getElementById(id);
+  const u = FF.q.get('u'), wk = FF.q.get('week');
+  const s = await FF.season();
+  FF.demoBanner(s, $('banner'));
+  const sid = String(s.season);
+  if (!u || !wk) { $('title').textContent = 'Result card: add ?u=login&week=N'; return; }
+  const wr = await FF.json(`data/results/${sid}/${wk}.json`);
+  const p = wr.players.find(x => x.login.toLowerCase() === u.toLowerCase());
+  const w = s.weeks.find(x => String(x.week) === String(wk));
+  if (!p) { $('title').textContent = `No result for ${u} in week ${wk}.`; return; }
+  $('back').href = FF.playerUrl(p.login, s);
+  const demo = FF.isDemo(s);
+  $('title').textContent = `${p.login} · ${demo ? 'DEMO · ' : ''}${w.label || 'Week ' + wk}`;
+  const c = $('c'), x = c.getContext('2d');
+  const W = 1080, H = 1350, F = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+  const navy = '#14112b', gold = '#ffcf4a', ink = '#f1effa', mute = '#a29fb8', line = '#2c2847';
+  x.fillStyle = navy; x.fillRect(0, 0, W, H);
+  const font = (w, sz) => (x.font = `${w} ${sz}px ${F}`);
+  const fit = (t, max) => { let s = t; while (x.measureText(s).width > max && s.length > 3) s = s.slice(0, -2); return s === t ? t : s.trimEnd() + '…'; };
+  // header
+  x.fillStyle = gold; x.fillRect(64, 64, 10, 92);
+  font(800, 40); x.fillStyle = gold; x.fillText('FANTASY FIVE', 96, 102);
+  font(600, 30); x.fillStyle = mute; x.fillText(`${demo ? 'DEMO · 2026 scores · ' : sid + ' · '}${w.label || 'Week ' + wk}`, 96, 148);
+  if (demo) { x.save(); x.translate(W - 64, 64); x.fillStyle = gold; x.beginPath(); x.roundRect(-150, 0, 150, 52, 10); x.fill(); font(900, 30); x.fillStyle = navy; x.textAlign = 'center'; x.fillText('DEMO', -75, 37); x.restore(); }
+  // player + total
+  font(700, 56); x.fillStyle = ink; x.fillText(fit(p.login, W - 128), 64, 262);
+  font(900, 150); x.fillStyle = gold; x.fillText(Number(p.total).toFixed(3), 58, 420);
+  font(600, 32); x.fillStyle = mute; x.fillText(`Rank ${p.rank} of ${wr.players.length} · 20 slots · no drops`, 64, 474);
+  // event grid
+  const colW = (W - 128 - 30) / 2, rowH = 46, top = 540;
+  FF.EVENTS.forEach((ev, i) => {
+    const cx = 64 + (i % 2) * (colW + 30), cy = top + Math.floor(i / 2) * 360;
+    x.strokeStyle = line; x.lineWidth = 2; x.beginPath(); x.roundRect(cx, cy, colW, 330, 18); x.stroke();
+    font(800, 30); x.fillStyle = gold; x.fillText(FF.EV_NAME[ev].toUpperCase(), cx + 24, cy + 50);
+    x.textAlign = 'right'; x.fillStyle = ink; x.fillText(Number(p.events[ev].total).toFixed(3), cx + colW - 24, cy + 50); x.textAlign = 'left';
+    p.events[ev].slots.forEach((sl, j) => {
+      const y = cy + 104 + j * rowH;
+      font(500, 26); x.fillStyle = sl.competed ? ink : mute;
+      x.fillText(fit(sl.name, colW - 170), cx + 24, y);
+      x.textAlign = 'right'; font(700, 26); x.fillStyle = sl.competed ? ink : '#e5243b';
+      x.fillText(sl.competed ? Number(sl.score).toFixed(3) : '0 DNC', cx + colW - 24, y); x.textAlign = 'left';
+    });
+  });
+  // footer
+  x.fillStyle = line; x.fillRect(64, H - 112, W - 128, 2);
+  font(700, 30); x.fillStyle = ink; x.fillText('@thefivethatscore', 64, H - 60);
+  x.textAlign = 'right'; font(600, 28); x.fillStyle = mute; x.fillText('Just the read.', W - 64, H - 60); x.textAlign = 'left';
+  $('dl').onclick = () => c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `fantasy-five-${sid}-w${wk}-${p.login}.png`; a.click(); });
+})().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load data: ' + e.message; });
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+{
+ "season": 2027,
+ "name": "2027 NCAA D1 women's gymnastics",
+ "roster": "data/gymnasts.json",
+ "rtn_season": 2027,
+ "week_rule": "A week runs Friday through Thursday (America/Chicago dates). Lineups lock at the week's `lock` (default Friday 17:00 America/Chicago). Every D1 meet dated inside the window counts.",
+ "scoring": {
+  "slots_per_event": 5,
+  "events": [
+   "vault",
+   "bars",
+   "beam",
+   "floor"
+  ],
+  "multi_meet": "best",
+  "dnc": 0,
+  "drops": 0
+ },
+ "weeks": [
+  {
+   "week": 1,
+   "label": "Week 1",
+   "start": "2027-01-01",
+   "end": "2027-01-07",
+   "lock": "2027-01-01T23:00:00Z",
+   "status": "scheduled",
+   "note": "Opening week. Lock times are provisional until the 2027 schedule is published; any week with a meet before Friday 5:00 PM CT gets an earlier lock."
+  },
+  {
+   "week": 2,
+   "label": "Week 2",
+   "start": "2027-01-08",
+   "end": "2027-01-14",
+   "lock": "2027-01-08T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 3,
+   "label": "Week 3",
+   "start": "2027-01-15",
+   "end": "2027-01-21",
+   "lock": "2027-01-15T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 4,
+   "label": "Week 4",
+   "start": "2027-01-22",
+   "end": "2027-01-28",
+   "lock": "2027-01-22T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 5,
+   "label": "Week 5",
+   "start": "2027-01-29",
+   "end": "2027-02-04",
+   "lock": "2027-01-29T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 6,
+   "label": "Week 6",
+   "start": "2027-02-05",
+   "end": "2027-02-11",
+   "lock": "2027-02-05T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 7,
+   "label": "Week 7",
+   "start": "2027-02-12",
+   "end": "2027-02-18",
+   "lock": "2027-02-12T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 8,
+   "label": "Week 8",
+   "start": "2027-02-19",
+   "end": "2027-02-25",
+   "lock": "2027-02-19T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 9,
+   "label": "Week 9",
+   "start": "2027-02-26",
+   "end": "2027-03-04",
+   "lock": "2027-02-26T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 10,
+   "label": "Week 10",
+   "start": "2027-03-05",
+   "end": "2027-03-11",
+   "lock": "2027-03-05T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 11,
+   "label": "Week 11",
+   "start": "2027-03-12",
+   "end": "2027-03-18",
+   "lock": "2027-03-12T23:00:00Z",
+   "status": "scheduled"
+  },
+  {
+   "week": 12,
+   "label": "Week 12 \u00b7 conference championships",
+   "start": "2027-03-19",
+   "end": "2027-03-25",
+   "lock": "2027-03-19T22:00:00Z",
+   "status": "scheduled"
+  }
+ ],
+ "demo": {
+  "season": "demo",
+  "file": "data/demo/season.json",
+  "note": "DEMO week built from real 2026 scores. Delete data/demo, data/*/demo and this key to remove."
+ }
+}

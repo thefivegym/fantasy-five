@@ -1,0 +1,30 @@
+{
+ "season": "demo",
+ "demo": true,
+ "name": "DEMO \u2014 real 2026 scores (Feb 13\u201315, 2026)",
+ "roster": "data/demo/gymnasts-2026.json",
+ "rtn_season": 2026,
+ "week_rule": "A week runs Friday through Thursday (America/Chicago dates). Lineups lock at the week's `lock` (default Friday 17:00 America/Chicago). Every D1 meet dated inside the window counts.",
+ "scoring": {
+  "slots_per_event": 5,
+  "events": [
+   "vault",
+   "bars",
+   "beam",
+   "floor"
+  ],
+  "multi_meet": "best",
+  "dnc": 0,
+  "drops": 0
+ },
+ "weeks": [
+  {
+   "week": 1,
+   "label": "DEMO \u00b7 Feb 13\u201319, 2026",
+   "start": "2026-02-13",
+   "end": "2026-02-19",
+   "lock": "2026-02-13T23:00:00Z",
+   "status": "final"
+  }
+ ]
+}

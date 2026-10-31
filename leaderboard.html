@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leaderboard — Fantasy Five</title>
+<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta property="og:title" content="Leaderboard — Fantasy Five">
+<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta name="twitter:site" content="@thefivethatscore">
+<meta name="theme-color" content="#14112b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+</head>
+<body>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h2 id="title">Leaderboard</h2>
+  <div class="controls">
+    <select id="season" aria-label="Season"></select>
+    <select id="view" aria-label="View"><option value="week">Weekly</option><option value="season">Season</option></select>
+    <select id="week" aria-label="Week"></select>
+  </div>
+  <div class="count" id="meta"></div>
+  <div class="card tscroll" style="padding:0"><table class="t" id="tbl"><thead></thead><tbody></tbody></table></div>
+</main>
+<script>
+FF.chrome('leaderboard.html');
+(async () => {
+  const $ = id => document.getElementById(id);
+  const { main, demo } = await FF.seasons();
+  const s = await FF.season();
+  $('season').innerHTML = `<option value="${main.season}">${main.season} season</option>` + (demo ? `<option value="${FF.esc(demo.season)}">DEMO (2026 scores)</option>` : '');
+  $('season').value = s.season;
+  $('season').onchange = () => { location.search = $('season').value === String(main.season) ? '' : `?season=${$('season').value}`; };
+  FF.demoBanner(s, $('banner'));
+  const sid = String(s.season);
+  const lb = await FF.json(`data/leaderboard/${sid}.json`, { weeks: [], players: [] });
+  const weeks = s.weeks.filter(w => lb.weeks.includes(w.week));
+  $('week').innerHTML = weeks.length ? weeks.map(w => `<option value="${w.week}">${FF.esc(w.label || 'Week ' + w.week)}</option>`).join('') : '<option value="">No scored weeks yet</option>';
+  $('week').value = FF.q.get('week') || (weeks.at(-1)?.week ?? '');
+  $('view').value = FF.q.get('view') || 'week';
+  async function render() {
+    const view = $('view').value;
+    $('week').hidden = view !== 'week';
+    const thead = document.querySelector('#tbl thead'), tbody = document.querySelector('#tbl tbody');
+    if (view === 'season') {
+      $('title').textContent = `Season leaderboard · ${FF.isDemo(s) ? 'DEMO' : sid}`;
+      $('meta').textContent = `${lb.players.length} players · ${lb.weeks.length} scored week(s) · sum of weekly totals`;
+      thead.innerHTML = `<tr><th class="n">#</th><th>Player</th><th class="n">Weeks</th><th class="n">Best</th><th class="n">Total</th></tr>`;
+      tbody.innerHTML = lb.players.map(p => `<tr><td class="n">${p.rank}</td><td><a href="${FF.playerUrl(p.login, s)}">${FF.esc(p.login)}</a></td><td class="n">${p.weeks_played}</td><td class="n">${FF.fTot(p.best_week?.total)}</td><td class="n"><b>${FF.fTot(p.total)}</b></td></tr>`).join('') || `<tr><td colspan="5" class="sub">No scored weeks yet. The first 2027 week scores after its meets.</td></tr>`;
+      return;
+    }
+    const wk = $('week').value;
+    if (!wk) { thead.innerHTML = ''; tbody.innerHTML = `<tr><td class="sub">No scored weeks yet. Week 1 scores after its meets. Meanwhile: <a href="leaderboard.html?season=demo">see the DEMO week</a>.</td></tr>`; $('meta').textContent = ''; return; }
+    const r = await FF.json(`data/results/${sid}/${wk}.json`);
+    const w = s.weeks.find(x => String(x.week) === String(wk));
+    $('title').textContent = `${FF.isDemo(s) ? 'DEMO · ' : ''}${w.label || 'Week ' + wk} · weekly`;
+    $('meta').textContent = `${r.players.length} lineups · scores ${r.scores_status}${r.scores_generated_at ? ' as of ' + FF.fmtCT(r.scores_generated_at) : ''} · multi-meet rule: ${r.mode}`;
+    thead.innerHTML = `<tr><th class="n">#</th><th>Player</th>${FF.EVENTS.map(e => `<th class="n">${FF.EV_SHORT[e]}</th>`).join('')}<th class="n">Total</th><th></th></tr>`;
+    tbody.innerHTML = r.players.map(p => `<tr><td class="n">${p.rank}</td><td><a href="${FF.playerUrl(p.login, s)}">${FF.esc(p.login)}</a></td>${FF.EVENTS.map(e => `<td class="n">${FF.f3(p.events[e].total)}</td>`).join('')}<td class="n"><b>${FF.fTot(p.total)}</b></td><td><a class="btn small" href="${FF.cardUrl(p.login, wk, s)}">Card</a></td></tr>`).join('') || `<tr><td colspan="8" class="sub">No lineups.</td></tr>`;
+  }
+  $('view').onchange = render; $('week').onchange = render;
+  render();
+})().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load data: ' + e.message; });
+</script>
+</body>
+</html>

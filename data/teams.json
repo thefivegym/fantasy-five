@@ -1,0 +1,998 @@
+{
+ "generated_at": "2026-10-31T17:49:54Z",
+ "source": "RTN D1 team list (2026 final rankings, div = \"Div I\") + official roster pages",
+ "teams": [
+  {
+   "id": "air-force",
+   "name": "Air Force",
+   "rtn_tid": 1,
+   "rtn_name": "Air Force",
+   "conference": "MW",
+   "roster_url": "https://goairforcefalcons.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "provisional-rtn-2026",
+   "roster_count": 18,
+   "note": "Official roster page still shows 2025-26; using the 2026 RTN roster minus 2026 seniors/graduate students. No 2026-27 freshmen or incoming transfers.",
+   "stale_check": {
+    "same_class_as_2026": 23,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "alabama",
+   "name": "Alabama",
+   "rtn_tid": 2,
+   "rtn_name": "Alabama",
+   "conference": "SEC",
+   "roster_url": "https://rolltide.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 28,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "alaska",
+   "name": "Alaska",
+   "rtn_tid": 3,
+   "rtn_name": "Alaska",
+   "conference": "MPSF",
+   "roster_url": "https://goseawolves.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 12
+   }
+  },
+  {
+   "id": "arizona",
+   "name": "Arizona",
+   "rtn_tid": 4,
+   "rtn_name": "Arizona",
+   "conference": "Big 12",
+   "roster_url": "https://arizonawildcats.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 26,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "arizona-state",
+   "name": "Arizona State",
+   "rtn_tid": 5,
+   "rtn_name": "Arizona State",
+   "conference": "Big 12",
+   "roster_url": "https://thesundevils.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 8
+   }
+  },
+  {
+   "id": "arkansas",
+   "name": "Arkansas",
+   "rtn_tid": 6,
+   "rtn_name": "Arkansas",
+   "conference": "SEC",
+   "roster_url": "https://arkansasrazorbacks.com/sport/w-gym/roster/",
+   "roster_source": "arkansas",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 8
+   }
+  },
+  {
+   "id": "auburn",
+   "name": "Auburn",
+   "rtn_tid": 7,
+   "rtn_name": "Auburn",
+   "conference": "SEC",
+   "roster_url": "https://auburntigers.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 18
+   }
+  },
+  {
+   "id": "ball-state",
+   "name": "Ball State",
+   "rtn_tid": 9,
+   "rtn_name": "Ball State",
+   "conference": "MAC",
+   "roster_url": "https://ballstatesports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 22,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 13
+   }
+  },
+  {
+   "id": "boise-state",
+   "name": "Boise State",
+   "rtn_tid": 10,
+   "rtn_name": "Boise State",
+   "conference": "MW",
+   "roster_url": "https://broncosports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 25,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "bowling-green",
+   "name": "Bowling Green",
+   "rtn_tid": 11,
+   "rtn_name": "Bowling Green",
+   "conference": "MAC",
+   "roster_url": "https://bgsufalcons.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 24,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "brown",
+   "name": "Brown",
+   "rtn_tid": 14,
+   "rtn_name": "Brown",
+   "conference": "GEC",
+   "roster_url": "https://brownbears.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 25,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 14
+   }
+  },
+  {
+   "id": "byu",
+   "name": "BYU",
+   "rtn_tid": 8,
+   "rtn_name": "BYU",
+   "conference": "Big 12",
+   "roster_url": "https://byucougars.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "california",
+   "name": "California",
+   "rtn_tid": 15,
+   "rtn_name": "California",
+   "conference": "ACC",
+   "roster_url": "https://calbears.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 28,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 1,
+    "advanced_one_year": 8
+   }
+  },
+  {
+   "id": "central-michigan",
+   "name": "Central Michigan",
+   "rtn_tid": 17,
+   "rtn_name": "Central Michigan",
+   "conference": "MAC",
+   "roster_url": "https://cmuchippewas.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 24,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 13
+   }
+  },
+  {
+   "id": "clemson",
+   "name": "Clemson",
+   "rtn_tid": 163,
+   "rtn_name": "Clemson",
+   "conference": "ACC",
+   "roster_url": "https://clemsontigers.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 22,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 1,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "cornell",
+   "name": "Cornell",
+   "rtn_tid": 18,
+   "rtn_name": "Cornell",
+   "conference": "GEC",
+   "roster_url": "https://cornellbigred.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 17
+   }
+  },
+  {
+   "id": "denver",
+   "name": "Denver",
+   "rtn_tid": 20,
+   "rtn_name": "Denver",
+   "conference": "Big 12",
+   "roster_url": "https://denverpioneers.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 10
+   }
+  },
+  {
+   "id": "eastern-michigan",
+   "name": "Eastern Michigan",
+   "rtn_tid": 21,
+   "rtn_name": "Eastern Michigan",
+   "conference": "MAC",
+   "roster_url": "https://emueagles.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 25,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 17
+   }
+  },
+  {
+   "id": "florida",
+   "name": "Florida",
+   "rtn_tid": 22,
+   "rtn_name": "Florida",
+   "conference": "SEC",
+   "roster_url": "https://floridagators.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 33,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 10
+   }
+  },
+  {
+   "id": "george-washington",
+   "name": "George Washington",
+   "rtn_tid": 23,
+   "rtn_name": "George Washington",
+   "conference": "EAGL",
+   "roster_url": "https://gwsports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "georgia",
+   "name": "Georgia",
+   "rtn_tid": 24,
+   "rtn_name": "Georgia",
+   "conference": "SEC",
+   "roster_url": "https://georgiadogs.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 33,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 14
+   }
+  },
+  {
+   "id": "illinois",
+   "name": "Illinois",
+   "rtn_tid": 28,
+   "rtn_name": "Illinois",
+   "conference": "Big Ten",
+   "roster_url": "https://fightingillini.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 25,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 12
+   }
+  },
+  {
+   "id": "illinois-state",
+   "name": "Illinois State",
+   "rtn_tid": 27,
+   "rtn_name": "Illinois State",
+   "conference": "MIC",
+   "roster_url": "https://goredbirds.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 11
+   }
+  },
+  {
+   "id": "iowa",
+   "name": "Iowa",
+   "rtn_tid": 29,
+   "rtn_name": "Iowa",
+   "conference": "Big Ten",
+   "roster_url": "https://hawkeyesports.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 9
+   }
+  },
+  {
+   "id": "iowa-state",
+   "name": "Iowa State",
+   "rtn_tid": 30,
+   "rtn_name": "Iowa State",
+   "conference": "Big 12",
+   "roster_url": "https://cyclones.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "kent-state",
+   "name": "Kent State",
+   "rtn_tid": 32,
+   "rtn_name": "Kent State",
+   "conference": "MAC",
+   "roster_url": "https://kentstatesports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 30,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "kentucky",
+   "name": "Kentucky",
+   "rtn_tid": 33,
+   "rtn_name": "Kentucky",
+   "conference": "SEC",
+   "roster_url": "https://ukathletics.com/sports/wgym/",
+   "roster_source": "kentucky",
+   "roster_status": "official-2026-27",
+   "roster_count": 21,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "liu",
+   "name": "LIU",
+   "rtn_tid": 128,
+   "rtn_name": "LIU",
+   "conference": "EAGL",
+   "roster_url": "https://www.liuathletics.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "lsu",
+   "name": "LSU",
+   "rtn_tid": 34,
+   "rtn_name": "LSU",
+   "conference": "SEC",
+   "roster_url": "https://lsusports.net",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 12
+   }
+  },
+  {
+   "id": "maryland",
+   "name": "Maryland",
+   "rtn_tid": 36,
+   "rtn_name": "Maryland",
+   "conference": "Big Ten",
+   "roster_url": "https://umterps.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 46,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "michigan",
+   "name": "Michigan",
+   "rtn_tid": 37,
+   "rtn_name": "Michigan",
+   "conference": "Big Ten",
+   "roster_url": "https://mgoblue.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "michigan-state",
+   "name": "Michigan State",
+   "rtn_tid": 38,
+   "rtn_name": "Michigan State",
+   "conference": "Big Ten",
+   "roster_url": "https://msuspartans.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 27,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "minnesota",
+   "name": "Minnesota",
+   "rtn_tid": 39,
+   "rtn_name": "Minnesota",
+   "conference": "Big Ten",
+   "roster_url": "https://gophersports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 24,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "missouri",
+   "name": "Missouri",
+   "rtn_tid": 40,
+   "rtn_name": "Missouri",
+   "conference": "SEC",
+   "roster_url": "https://mutigers.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "nebraska",
+   "name": "Nebraska",
+   "rtn_tid": 41,
+   "rtn_name": "Nebraska",
+   "conference": "Big Ten",
+   "roster_url": "https://huskers.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "new-hampshire",
+   "name": "New Hampshire",
+   "rtn_tid": 42,
+   "rtn_name": "New Hampshire",
+   "conference": "EAGL",
+   "roster_url": "https://unhwildcats.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 33,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "north-carolina",
+   "name": "North Carolina",
+   "rtn_tid": 43,
+   "rtn_name": "North Carolina",
+   "conference": "ACC",
+   "roster_url": "https://goheels.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 21,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "north-carolina-state",
+   "name": "North Carolina State",
+   "rtn_tid": 44,
+   "rtn_name": "North Carolina State",
+   "conference": "ACC",
+   "roster_url": "https://gopack.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 34,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "northern-illinois",
+   "name": "Northern Illinois",
+   "rtn_tid": 45,
+   "rtn_name": "Northern Illinois",
+   "conference": "MAC",
+   "roster_url": "https://niuhuskies.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "ohio-state",
+   "name": "Ohio State",
+   "rtn_tid": 46,
+   "rtn_name": "Ohio State",
+   "conference": "Big Ten",
+   "roster_url": "https://ohiostatebuckeyes.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 26,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "oklahoma",
+   "name": "Oklahoma",
+   "rtn_tid": 47,
+   "rtn_name": "Oklahoma",
+   "conference": "SEC",
+   "roster_url": "https://soonersports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 31,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "oregon-state",
+   "name": "Oregon State",
+   "rtn_tid": 48,
+   "rtn_name": "Oregon State",
+   "conference": "PAC-12",
+   "roster_url": "https://osubeavers.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 26,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "penn-state",
+   "name": "Penn State",
+   "rtn_tid": 49,
+   "rtn_name": "Penn State",
+   "conference": "Big Ten",
+   "roster_url": "https://gopsusports.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 16,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "pennsylvania",
+   "name": "Pennsylvania",
+   "rtn_tid": 50,
+   "rtn_name": "Pennsylvania",
+   "conference": "GEC",
+   "roster_url": "https://pennathletics.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "pittsburgh",
+   "name": "Pittsburgh",
+   "rtn_tid": 51,
+   "rtn_name": "Pittsburgh",
+   "conference": "ACC",
+   "roster_url": "https://pittsburghpanthers.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 22,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "rutgers",
+   "name": "Rutgers",
+   "rtn_tid": 53,
+   "rtn_name": "Rutgers",
+   "conference": "Big Ten",
+   "roster_url": "https://scarletknights.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 34,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "se-missouri",
+   "name": "S.E. Missouri",
+   "rtn_tid": 54,
+   "rtn_name": "S.E. Missouri",
+   "conference": "MIC",
+   "roster_url": "https://semoredhawks.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 22,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "sacramento-state",
+   "name": "Sacramento State",
+   "rtn_tid": 55,
+   "rtn_name": "Sacramento State",
+   "conference": "MPSF",
+   "roster_url": "https://hornetsports.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "san-jose-state",
+   "name": "San Jose State",
+   "rtn_tid": 56,
+   "rtn_name": "San Jose State",
+   "conference": "MW",
+   "roster_url": "https://sjsuspartans.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "southern-utah",
+   "name": "Southern Utah",
+   "rtn_tid": 59,
+   "rtn_name": "Southern Utah",
+   "conference": "MPSF",
+   "roster_url": "https://suutbirds.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 23,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "stanford",
+   "name": "Stanford",
+   "rtn_tid": 61,
+   "rtn_name": "Stanford",
+   "conference": "ACC",
+   "roster_url": "https://gostanford.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "temple",
+   "name": "Temple",
+   "rtn_tid": 62,
+   "rtn_name": "Temple",
+   "conference": "EAGL",
+   "roster_url": "https://owlsports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 35,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "towson",
+   "name": "Towson",
+   "rtn_tid": 64,
+   "rtn_name": "Towson",
+   "conference": "EAGL",
+   "roster_url": "https://towsontigers.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 21,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "uc-davis",
+   "name": "UC Davis",
+   "rtn_tid": 65,
+   "rtn_name": "UC Davis",
+   "conference": "MPSF",
+   "roster_url": "https://ucdavisaggies.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "ucla",
+   "name": "UCLA",
+   "rtn_tid": 66,
+   "rtn_name": "UCLA",
+   "conference": "Big Ten",
+   "roster_url": "https://uclabruins.com",
+   "roster_source": "wmt",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "utah",
+   "name": "Utah",
+   "rtn_tid": 69,
+   "rtn_name": "Utah",
+   "conference": "Big 12",
+   "roster_url": "https://utahutes.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 22,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "utah-state",
+   "name": "Utah State",
+   "rtn_tid": 70,
+   "rtn_name": "Utah State",
+   "conference": "MW",
+   "roster_url": "https://utahstateaggies.com/sports/womens-gymnastics/roster",
+   "roster_source": "sidearm-json",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "washington",
+   "name": "Washington",
+   "rtn_tid": 71,
+   "rtn_name": "Washington",
+   "conference": "Big Ten",
+   "roster_url": "https://gohuskies.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 18,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "west-virginia",
+   "name": "West Virginia",
+   "rtn_tid": 73,
+   "rtn_name": "West Virginia",
+   "conference": "Big 12",
+   "roster_url": "https://wvusports.com/sports/womens-gymnastics/roster",
+   "roster_source": "nuxt-sidearm",
+   "roster_status": "official-2026-27",
+   "roster_count": 35,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "western-michigan",
+   "name": "Western Michigan",
+   "rtn_tid": 74,
+   "rtn_name": "Western Michigan",
+   "conference": "MAC",
+   "roster_url": "https://wmubroncos.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 20,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "william-mary",
+   "name": "William & Mary",
+   "rtn_tid": 75,
+   "rtn_name": "William & Mary",
+   "conference": "GEC",
+   "roster_url": "https://tribeathletics.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  },
+  {
+   "id": "yale",
+   "name": "Yale",
+   "rtn_tid": 82,
+   "rtn_name": "Yale",
+   "conference": "GEC",
+   "roster_url": "https://yalebulldogs.com/sports/womens-gymnastics/roster",
+   "roster_source": "classic",
+   "roster_status": "official-2026-27",
+   "roster_count": 19,
+   "note": null,
+   "stale_check": {
+    "same_class_as_2026": 0,
+    "advanced_one_year": 0
+   }
+  }
+ ]
+}

@@ -1,0 +1,46 @@
+name: Score week
+on:
+  workflow_dispatch:
+    inputs:
+      week:
+        description: 'Week number to fetch (blank = every started week whose scores are not final)'
+        required: false
+      fetch:
+        description: 'Fetch scores from Road to Nationals first'
+        type: boolean
+        default: true
+  schedule:
+    - cron: '0 13 * * 0,1'   # Sun + Mon 13:00 UTC (7:00 AM CST)
+    - cron: '0 5 * * 6,0'    # Sat + Sun 05:00 UTC (11:00 PM CST Fri/Sat) for a provisional read
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Fetch scores (RTN, 30 s between requests)
+        if: github.event_name == 'schedule' || inputs.fetch
+        env:
+          WEEK: ${{ inputs.week }}
+        run: |
+          if [ -n "$WEEK" ]; then node scripts/fetch-scores-rtn.mjs --week="$WEEK"; else node scripts/fetch-scores-rtn.mjs --auto; fi
+      - run: node scripts/score.mjs
+      - name: Commit
+        run: |
+          git config user.name "fantasy-five-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "No change"; exit 0; fi
+          git commit -m "Scores and results $(date -u +%FT%TZ)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
+  deploy:
+    needs: score
+    uses: ./.github/workflows/deploy.yml
