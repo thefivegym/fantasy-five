@@ -37,7 +37,7 @@ export async function scoreSeason(seasonId) {
     for (const p of res.players) for (const ev of Object.keys(p.events)) for (const sl of p.events[ev].slots) {
       const g = byId[sl.id]; sl.name = g?.name || sl.id; sl.team = g?.team || null;
     }
-    res.demo = !!season.demo;
+    res.demo = season.demo === true;
     res.label = w.label || `Week ${w.week}`;
     res.generated_at = new Date().toISOString();
     await writeJson(join(DATA, 'results', sid, `${w.week}.json`), res);
@@ -45,7 +45,7 @@ export async function scoreSeason(seasonId) {
     list.push(res);
   }
   const lb = seasonLeaderboard(season.season, list);
-  lb.demo = !!season.demo;
+  lb.demo = season.demo === true;
   lb.generated_at = new Date().toISOString();
   await writeJson(join(DATA, 'leaderboard', `${sid}.json`), lb);
   console.log(`${sid} leaderboard: ${lb.players.length} players over ${lb.weeks.length} scored week(s)`);

@@ -55,7 +55,7 @@ const FF = (() => {
   }
   /** Projection used for sorting and the builder's projected total: 2026 NQS, else 2026 average, else null. */
   const proj = (g, ev) => { const p = g?.proj?.[ev]; return p ? (p.nqs ?? p.avg ?? null) : null; };
-  const isDemo = s => !!s?.demo;
+  const isDemo = s => s?.demo === true;
   /** Tag for a gymnast with no projection on an event: NEW = no 2026 NCAA record; no RQS = competed in 2026 but too few scores to rank. */
   const noProj = g => (g?.projection_status === 'none' || !g?.rtn_ids?.length) ? '<span class="pill new" title="No 2026 NCAA record">NEW</span>' : '<span class="pill" title="No 2026 RQS on this event">no RQS</span>';
   const seasonParam = s => (isDemo(s) ? `season=${encodeURIComponent(s.season)}&` : '');

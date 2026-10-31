@@ -91,7 +91,7 @@ async function fetchWeek(season, week, ctx) {
   }
   const ended = new Date(`${week.end}T23:59:59-06:00`).getTime() < Date.now();
   const out = {
-    season: season.season, week: week.week, demo: !!season.demo,
+    season: season.season, week: week.week, demo: season.demo === true,
     source: 'Road to Nationals (roadtonationals.com) /api/women/meetresults',
     generated_at: new Date().toISOString(),
     status: ended && !anyLive && !missing.length ? 'final' : 'partial',

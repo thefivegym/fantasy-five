@@ -40,7 +40,7 @@ export async function processSubmission({ issue, action, now }) {
   try { season = await loadSeason(data.season); } catch { return { ok: false, errors: [`Season ${JSON.stringify(data.season)} does not exist.`] }; }
   const week = season.weeks.find(w => Number(w.week) === Number(data.week));
   if (!week) return { ok: false, errors: [`Week ${JSON.stringify(data.week)} is not in season ${season.season}.`] };
-  if (season.demo) errors.push('The DEMO week is closed. Real lineups go to the 2027 season.');
+  if (season.demo === true) errors.push('The DEMO week is closed. Real lineups go to the 2027 season.');
   const t = new Date(submittedAt).getTime();
   if (!(t < new Date(week.lock).getTime())) errors.push(`Week ${week.week} locked at ${fmtCT(week.lock)}. This ${action === 'edited' ? 'edit' : 'submission'} is timestamped ${fmtCT(submittedAt)}.`);
   // The "right week" is the earliest week whose lock is still ahead of the submission time.
