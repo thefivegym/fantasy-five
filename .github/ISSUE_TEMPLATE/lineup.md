@@ -5,8 +5,8 @@ title: "Lineup: "
 labels: ["lineup"]
 ---
 <!-- Build your lineup at https://thefivegym.github.io/fantasy-five/build.html and press "Submit with GitHub".
-     It fills this issue with a JSON block like the one below. -->
+     Schema 2: five gymnast ids, one per slot, five different teams. -->
 
 ```json
-{"game":"fantasy-five","season":2027,"week":1,"lineup":{"vault":[],"bars":[],"beam":[],"floor":[]}}
+{"game":"fantasy-five","schema":2,"season":2027,"week":1,"lineup":{"vault":"","bars":"","beam":"","floor":"","aa":""}}
 ```

@@ -51,21 +51,17 @@ FF.chrome('');
   // player + total
   font(700, 56); x.fillStyle = ink; x.fillText(fit(p.login, W - 128), 64, 262);
   font(900, 150); x.fillStyle = gold; x.fillText(Number(p.total).toFixed(3), 58, 420);
-  font(600, 32); x.fillStyle = mute; x.fillText(`Rank ${p.rank} of ${wr.players.length} · 20 slots · no drops`, 64, 474);
-  // event grid
-  const colW = (W - 128 - 30) / 2, rowH = 46, top = 540;
-  FF.EVENTS.forEach((ev, i) => {
-    const cx = 64 + (i % 2) * (colW + 30), cy = top + Math.floor(i / 2) * 360;
-    x.strokeStyle = line; x.lineWidth = 2; x.beginPath(); x.roundRect(cx, cy, colW, 330, 18); x.stroke();
-    font(800, 30); x.fillStyle = gold; x.fillText(FF.EV_NAME[ev].toUpperCase(), cx + 24, cy + 50);
-    x.textAlign = 'right'; x.fillStyle = ink; x.fillText(Number(p.events[ev].total).toFixed(3), cx + colW - 24, cy + 50); x.textAlign = 'left';
-    p.events[ev].slots.forEach((sl, j) => {
-      const y = cy + 104 + j * rowH;
-      font(500, 26); x.fillStyle = sl.competed ? ink : mute;
-      x.fillText(fit(sl.name, colW - 170), cx + 24, y);
-      x.textAlign = 'right'; font(700, 26); x.fillStyle = sl.competed ? ink : '#e5243b';
-      x.fillText(sl.competed ? Number(sl.score).toFixed(3) : '0 DNC', cx + colW - 24, y); x.textAlign = 'left';
-    });
+  font(600, 32); x.fillStyle = mute; x.fillText(`Rank ${p.rank} of ${wr.players.length} · 4 events + AA · 5 teams`, 64, 474);
+  // five rows: VT, UB, BB, FX, AA
+  const top = 540, rowH = 118, left = 64, right = W - 64;
+  FF.SLOTS.forEach((k, i) => {
+    const sl = p.slots[k], y = top + i * rowH;
+    x.strokeStyle = line; x.lineWidth = 2; x.beginPath(); x.roundRect(left, y, right - left, rowH - 16, 18); x.stroke();
+    font(900, 34); x.fillStyle = gold; x.fillText(FF.EV_SHORT[k], left + 28, y + 64);
+    font(700, 34); x.fillStyle = sl.competed ? ink : mute; x.fillText(fit(sl.name, 560), left + 130, y + 52);
+    font(500, 24); x.fillStyle = mute; x.fillText(fit(sl.team || '', 560), left + 130, y + 84);
+    x.textAlign = 'right'; font(800, 44); x.fillStyle = sl.competed ? ink : '#e5243b';
+    x.fillText(sl.competed ? Number(sl.score).toFixed(3) : '0 DNC', right - 28, y + 66); x.textAlign = 'left';
   });
   // footer
   x.fillStyle = line; x.fillRect(64, H - 112, W - 128, 2);

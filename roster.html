@@ -17,11 +17,11 @@
 <main class="wrap">
   <div id="banner" class="banner" hidden></div>
   <h2>Roster</h2>
-  <p class="sub">2026–27 D1 rosters. Numbers are 2026 Road to Nationals event averages and NQS (final regular-season RQS). They guide the draft; they don't score anything. <span class="pill new">NEW</span> = no 2026 NCAA record (freshman or newcomer). <span class="pill">no RQS</span> = competed in 2026 but not enough on that event for an RQS. Neither gets a projection.</p>
+  <p class="sub">2026–27 D1 rosters. Numbers are 2026 Road to Nationals averages and NQS (final regular-season RQS) per event and all-around (AA). They guide the draft; they don't score anything. <span class="pill new">NEW</span> = no 2026 NCAA record (freshman or newcomer). <span class="pill">no RQS</span> = competed in 2026 but not enough on that event for an RQS. <span class="pill">no AA history</span> = not in the 2026 RTN all-around rankings. None of these get a projection.</p>
   <div class="controls">
     <input type="search" id="q" placeholder="Search name or team" aria-label="Search">
     <select id="team" aria-label="Team"><option value="">All teams</option></select>
-    <select id="ev" aria-label="Event"><option value="">All events</option><option value="vault">Vault</option><option value="bars">Bars</option><option value="beam">Beam</option><option value="floor">Floor</option></select>
+    <select id="ev" aria-label="Event"><option value="">All events</option><option value="vault">Vault</option><option value="bars">Bars</option><option value="beam">Beam</option><option value="floor">Floor</option><option value="aa">All-Around</option></select>
     <select id="sort" aria-label="Sort">
       <option value="proj">Sort: projection (NQS, else avg)</option>
       <option value="avg">Sort: 2026 average</option>
@@ -49,7 +49,7 @@ FF.chrome('roster.html');
   const c = G.coverage;
   $('cov').textContent = `Coverage: ${c.teams_with_roster} of ${c.teams_total} D1 teams, ${G.gymnasts.length} gymnasts, ${c.with_projection} with a 2026 projection on at least one event. Sources in the repo README.`;
   const val = (g, ev, kind) => {
-    const evs = ev ? [ev] : FF.EVENTS;
+    const evs = ev ? [ev] : FF.EVENTS;   // 'All events' sorts by best apparatus number, not AA
     const xs = evs.map(e => kind === 'avg' ? g.proj?.[e]?.avg : FF.proj(g, e)).filter(x => x != null);
     if (!xs.length) return null;
     return ev ? xs[0] : Math.max(...xs);
@@ -62,11 +62,11 @@ FF.chrome('roster.html');
     else if (sort === 'team') rows.sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name));
     else rows.sort((a, b) => (val(b, ev, sort) ?? -1) - (val(a, ev, sort) ?? -1) || a.name.localeCompare(b.name));
     $('count').textContent = `${rows.length} gymnasts`;
-    const evs = ev ? [ev] : FF.EVENTS;
+    const evs = ev ? [ev] : FF.SLOTS;
     document.querySelector('#tbl thead').innerHTML = `<tr><th>Gymnast</th><th>Team</th><th>Yr</th>${evs.map(e => ev ? `<th class="n">${FF.EV_SHORT[e]} avg</th><th class="n">NQS</th><th class="n">High</th>` : `<th class="n" title="2026 NQS, else average">${FF.EV_SHORT[e]}</th>`).join('')}</tr>`;
     const cell = (g, e) => {
       const p = g.proj?.[e];
-      if (ev) return p ? `<td class="n">${FF.f3(p.avg)}</td><td class="n">${FF.f3(p.nqs)}</td><td class="n">${FF.f3(p.high)}</td>` : `<td class="n" colspan="3">${FF.noProj(g)}</td>`;
+      if (ev) return p ? `<td class="n">${FF.f3(p.avg)}</td><td class="n">${FF.f3(p.nqs)}</td><td class="n">${FF.f3(p.high)}</td>` : `<td class="n" colspan="3">${FF.noProj(g, e)}</td>`;
       return `<td class="n">${p ? FF.f3(p.nqs ?? p.avg) : '<span class="sub">—</span>'}</td>`;
     };
     document.querySelector('#tbl tbody').innerHTML = rows.slice(0, 600).map(g => `<tr><td><b>${FF.esc(g.name)}</b>${g.projection_status === 'none' ? ' <span class="pill new">NEW</span>' : ''}${g.prev_team && g.prev_team !== g.team ? `<div class="sub">2026: ${FF.esc(g.prev_team)}</div>` : ''}</td><td>${FF.esc(g.team)}</td><td>${FF.esc(g.class_year || '')}</td>${evs.map(e => cell(g, e)).join('')}</tr>`).join('')

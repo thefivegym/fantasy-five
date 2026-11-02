@@ -2,8 +2,9 @@
 const FF = (() => {
   const REPO = 'thefivegym/fantasy-five';
   const EVENTS = ['vault', 'bars', 'beam', 'floor'];
-  const EV_SHORT = { vault: 'VT', bars: 'UB', beam: 'BB', floor: 'FX' };
-  const EV_NAME = { vault: 'Vault', bars: 'Bars', beam: 'Beam', floor: 'Floor' };
+  const SLOTS = ['vault', 'bars', 'beam', 'floor', 'aa'];
+  const EV_SHORT = { vault: 'VT', bars: 'UB', beam: 'BB', floor: 'FX', aa: 'AA' };
+  const EV_NAME = { vault: 'Vault', bars: 'Bars', beam: 'Beam', floor: 'Floor', aa: 'All-Around' };
   const TZ = 'America/Chicago';
   const cache = {};
   const v = () => Math.floor(Date.now() / 60000); // 1-minute cache buster for data files
@@ -60,7 +61,8 @@ const FF = (() => {
   const proj = (g, ev) => { const p = g?.proj?.[ev]; return p ? (p.nqs ?? p.avg ?? null) : null; };
   const isDemo = s => s?.demo === true;
   /** Tag for a gymnast with no projection on an event: NEW = no 2026 NCAA record; no RQS = competed in 2026 but too few scores to rank. */
-  const noProj = g => (g?.projection_status === 'none' || !g?.rtn_ids?.length) ? '<span class="pill new" title="No 2026 NCAA record">NEW</span>' : '<span class="pill" title="No 2026 RQS on this event">no RQS</span>';
+  const noProj = (g, slot) => (g?.projection_status === 'none' || !g?.rtn_ids?.length) ? '<span class="pill new" title="No 2026 NCAA record">NEW</span>'
+    : slot === 'aa' ? '<span class="pill" title="Not in the 2026 RTN all-around rankings">no AA history</span>' : '<span class="pill" title="No 2026 RQS on this event">no RQS</span>';
   const seasonParam = s => (isDemo(s) ? `season=${encodeURIComponent(s.season)}&` : '');
 
   function chrome(active) {
@@ -86,5 +88,5 @@ const FF = (() => {
   const cardUrl = (login, week, s) => `card.html?${seasonParam(s)}u=${encodeURIComponent(login)}&week=${week}`;
   const isDemoLogin = l => /^DEMO-/i.test(l);
 
-  return { REPO, EVENTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
+  return { REPO, EVENTS, SLOTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
 })();

@@ -8,7 +8,7 @@ import { readFile, appendFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DATA, readJson, writeJson, loadSeason } from './lib/io.mjs';
 import { validateLineup } from './lib/scoring.mjs';
-import { EVENTS, LINEUP_TITLE_PREFIX, LINEUP_LABEL } from './lib/config.mjs';
+import { SLOTS, SLOT_LABEL, LINEUP_SCHEMA, LINEUP_TITLE_PREFIX, LINEUP_LABEL } from './lib/config.mjs';
 
 const EVENT_PATH = process.env.GITHUB_EVENT_PATH || process.argv[2];
 const COMMENT_FILE = process.env.COMMENT_FILE || 'lineup-comment.md';
@@ -46,15 +46,17 @@ export async function processSubmission({ issue, action, now }) {
   // The "right week" is the earliest week whose lock is still ahead of the submission time.
   const open = season.weeks.filter(w => new Date(w.lock).getTime() > t).sort((a, b) => new Date(a.lock) - new Date(b.lock))[0];
   if (open && Number(open.week) !== Number(week.week) && !errors.length) errors.push(`Week ${week.week} is not open yet. The open week is ${open.week} (locks ${fmtCT(open.lock)}).`);
+  if (Number(data.schema ?? 1) !== LINEUP_SCHEMA && !(data.lineup && ['vault', 'bars', 'beam', 'floor'].some(k => Array.isArray(data.lineup[k]))))
+    errors.push(`Lineup schema ${JSON.stringify(data.schema ?? 1)} is not supported. Current schema is ${LINEUP_SCHEMA}. Rebuild it in the builder.`);
   const gym = await readJson(join(DATA, 'gymnasts.json'));
   const ids = new Set(gym.gymnasts.map(g => g.id));
   errors.push(...validateLineup(data.lineup, ids, new Map(gym.gymnasts.map(g => [g.id, g.team]))));
   if (errors.length) return { ok: false, errors, week: week.week, season: season.season };
   const login = issue.user.login;
   const record = {
-    login, season: season.season, week: week.week, submitted_at: submittedAt,
+    schema: LINEUP_SCHEMA, login, season: season.season, week: week.week, submitted_at: submittedAt,
     issue: issue.number, issue_url: issue.html_url,
-    lineup: Object.fromEntries(EVENTS.map(ev => [ev, data.lineup[ev]])),
+    lineup: Object.fromEntries(SLOTS.map(s => [s, data.lineup[s]])),
   };
   const path = join('data', 'lineups', String(season.season), String(week.week), `${login.toLowerCase()}.json`);
   return { ok: true, errors: [], record, path, week: week.week, season: season.season, lock: week.lock, names: Object.fromEntries(gym.gymnasts.map(g => [g.id, `${g.name} (${g.team})`])) };
@@ -65,7 +67,7 @@ function comment(res, issue) {
     return [`Not accepted.`, '', ...res.errors.map(e => `- ${e}`), '', 'Fix it in the builder and submit again (a new issue, or edit this one before the lock). Nothing was saved.'].join('\n');
   }
   const lines = [`Lineup saved for week ${res.week}, ${res.season}. Locks ${fmtCT(res.lock)}.`, ''];
-  for (const ev of EVENTS) lines.push(`**${ev[0].toUpperCase() + ev.slice(1)}:** ${res.record.lineup[ev].map(id => res.names[id]).join(' · ')}`);
+  for (const s of SLOTS) lines.push(`**${SLOT_LABEL[s]}:** ${res.names[res.record.lineup[s]]}`);
   lines.push('', 'A later submission before the lock replaces this one. Just the read.');
   return lines.join('\n');
 }

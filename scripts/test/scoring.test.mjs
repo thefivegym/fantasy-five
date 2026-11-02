@@ -1,12 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { slotValue, scoreLineup, validateLineup, weekResults, seasonLeaderboard, rank } from '../lib/scoring.mjs';
-import { extractJson, isLineupIssue } from '../process-lineup.mjs';
+import { slotValue, deriveAA, scoreLineup, validateLineup, weekResults, seasonLeaderboard, rank } from '../lib/scoring.mjs';
+import { SLOTS, MAX_PER_TEAM_PER_LINEUP, MAX_USES_PER_GYMNAST, LINEUP_SCHEMA } from '../lib/config.mjs';
+import { extractJson, isLineupIssue, processSubmission } from '../process-lineup.mjs';
 import { extractScores, buildIndex, meetsInWindow } from '../fetch-scores-rtn.mjs';
 
 const week = JSON.parse(readFileSync(new URL('./fixtures/week.json', import.meta.url)));
-const L = { vault: ['a', 'b', 'd', 'e', 'f'], bars: ['a', 'b', 'c', 'd', 'e'], beam: ['a', 'b', 'c', 'd', 'e'], floor: ['a', 'b', 'c', 'd', 'e'] };
+const L = { vault: 'a', bars: 'b', beam: 'c', floor: 'd', aa: 'e' };
+const TEAM = { a: 'Oklahoma', b: 'LSU', c: 'Utah', d: 'UCLA', e: 'Florida', f: 'Oklahoma', g: 'Georgia' };
+const IDS = new Set(Object.keys(TEAM));
+
+test('constants', () => {
+  assert.deepEqual(SLOTS, ['vault', 'bars', 'beam', 'floor', 'aa']);
+  assert.equal(MAX_PER_TEAM_PER_LINEUP, 1);
+  assert.equal(MAX_USES_PER_GYMNAST, 1);
+  assert.equal(LINEUP_SCHEMA, 2);
+});
 
 test('best score counts when a gymnast competes twice', () => {
   assert.equal(slotValue(week.scores.a.vault, 'best'), 9.95);
@@ -14,34 +24,51 @@ test('best score counts when a gymnast competes twice', () => {
   assert.equal(slotValue([], 'best'), 0);
 });
 
-test('lineup total = sum of 20 slots, DNC = 0, no drops', () => {
+test('AA only from a meet with all four events; best AA total counts', () => {
+  // e: meet 1 has all four (9.9+9.85+9.8+9.9 = 39.45); meet 2 has no floor -> not an AA.
+  assert.deepEqual(deriveAA(week.scores.e).map(x => [x.meet_id, x.score]), [[1, 39.45]]);
+  assert.deepEqual(deriveAA(week.scores.a), []);
+  const twoAA = { vault: [{ score: 9.9, meet_id: 1 }, { score: 9.95, meet_id: 2 }], bars: [{ score: 9.9, meet_id: 1 }, { score: 9.9, meet_id: 2 }], beam: [{ score: 9.9, meet_id: 1 }, { score: 9.9, meet_id: 2 }], floor: [{ score: 9.9, meet_id: 1 }, { score: 9.95, meet_id: 2 }] };
+  assert.equal(slotValue(deriveAA(twoAA), 'best'), 39.7);
+  assert.equal(slotValue(deriveAA(twoAA), 'average'), 39.65);
+});
+
+test('lineup total = 4 event scores + 1 AA; DNC = 0', () => {
   const s = scoreLineup(L, week, 'best');
-  assert.equal(s.events.vault.total, 39.2);   // 9.95 + 9.8 + 9.75 + 9.7 + 0 (f did not compete)
-  assert.equal(s.events.bars.total, 9.9);
-  assert.equal(s.events.beam.total, 9.9);
-  assert.equal(s.events.floor.total, 9.85);
-  assert.equal(s.total, 68.85);
-  assert.equal(s.events.vault.slots[4].competed, false);
+  assert.equal(s.slots.vault.score, 9.95);
+  assert.equal(s.slots.bars.score, 9.9);
+  assert.equal(s.slots.beam.score, 9.9);
+  assert.equal(s.slots.floor.score, 9.75);
+  assert.equal(s.slots.aa.score, 39.45);
+  assert.equal(s.total, 78.95);
+  const dnc = scoreLineup({ ...L, aa: 'a' }, week);      // a never did all four
+  assert.equal(dnc.slots.aa.score, 0);
+  assert.equal(dnc.slots.aa.competed, false);
+  assert.equal(dnc.total, 39.5);
+  // a precomputed scores.<id>.aa wins over derivation
+  assert.equal(scoreLineup(L, { scores: { ...week.scores, e: { ...week.scores.e, aa: [{ score: 39.5, meet_id: 9 }] } } }).slots.aa.score, 39.5);
 });
 
-test('validation: 5 unique known ids per event', () => {
-  const ids = new Set(['a', 'b', 'c', 'd', 'e', 'f']);
-  assert.deepEqual(validateLineup(L, ids), []);
-  const bad = { ...L, vault: ['a', 'a', 'b', 'c'], floor: ['a', 'b', 'c', 'd', 'zz'] };
-  const errs = validateLineup(bad, ids);
-  assert.ok(errs.some(e => /vault: has 4 picks/.test(e)));
-  assert.ok(errs.some(e => /vault: a is picked twice/.test(e)));
-  assert.ok(errs.some(e => /floor: zz is not in/.test(e)));
-  assert.ok(validateLineup({ vault: [] }, ids).some(e => /bars: missing/.test(e)));
+test('validation: 5 slots, known ids, one slot per gymnast, one per team', () => {
+  assert.deepEqual(validateLineup(L, IDS, TEAM), []);
+  assert.deepEqual(validateLineup({ ...L, aa: undefined }, IDS, TEAM), ['All-Around: empty. Needs one gymnast.']);
+  assert.deepEqual(validateLineup({ ...L, beam: 'zz' }, IDS, TEAM), ['Beam: zz is not in data/gymnasts.json.']);
+  assert.deepEqual(validateLineup({ ...L, aa: 'a' }, IDS, TEAM), [
+    'a is in 2 slots (Vault, All-Around). A gymnast can fill one slot.',
+    '2 picks from Oklahoma (Vault: a, All-Around: a). Max 1 per team per lineup.',
+  ]);
+  assert.deepEqual(validateLineup({ ...L, floor: 'f' }, IDS, TEAM), ['2 picks from Oklahoma (Vault: a, Floor: f). Max 1 per team per lineup.']);
+  assert.deepEqual(validateLineup({ ...L, floor: 'f' }, IDS, TEAM, { maxPerTeam: 2 }), []);   // configurable
+  assert.match(validateLineup({ vault: ['a', 'b', 'c', 'd', 'e'], bars: [], beam: [], floor: [] }, IDS, TEAM)[0], /^Old format/);
+  assert.deepEqual(validateLineup({ ...L, extra: 'g' }, IDS, TEAM), ['Unknown keys in lineup: extra.']);
 });
 
-test('weekly ranks and season leaderboard', () => {
-  const w1 = weekResults({ season: 't', week: 1, weekScores: week, lineups: { x: { lineup: L }, y: { lineup: { ...L, vault: ['b', 'd', 'e', 'f', 'g'] } } } });
-  assert.equal(w1.players[0].login, 'x');
-  assert.equal(w1.players[0].rank, 1);
+test('weekly ranks, v1 files skipped, season leaderboard', () => {
+  const w1 = weekResults({ season: 't', week: 1, weekScores: week, lineups: {
+    x: { schema: 2, lineup: L }, y: { schema: 2, lineup: { ...L, aa: 'a' } }, old: { lineup: { vault: ['a'] } } } });
+  assert.deepEqual(w1.players.map(p => [p.login, p.rank]), [['x', 1], ['y', 2]]);
   const lb = seasonLeaderboard('t', [w1, { ...w1, week: 2 }]);
-  assert.equal(lb.players[0].total, Math.round(2 * w1.players[0].total * 1000) / 1000);
-  assert.equal(lb.players[0].weeks_played, 2);
+  assert.equal(lb.players[0].total, 157.9);
   assert.deepEqual(rank([{ login: 'p', total: 1 }, { login: 'q', total: 1 }, { login: 'r', total: 0 }]).map(r => r.rank), [1, 1, 3]);
 });
 
@@ -51,6 +78,29 @@ test('issue body parsing', () => {
   assert.ok(isLineupIssue({ title: 'Lineup: 2027 week 1', labels: [] }));
   assert.ok(isLineupIssue({ title: 'x', labels: [{ name: 'lineup' }] }));
   assert.ok(!isLineupIssue({ title: 'Bug report', labels: [] }));
+});
+
+test('lineup processor: exact errors against the real roster', async () => {
+  const gym = JSON.parse(readFileSync(new URL('../../data/gymnasts.json', import.meta.url))).gymnasts;
+  const season = JSON.parse(readFileSync(new URL('../../data/season.json', import.meta.url)));
+  const open = season.weeks.find(w => new Date(w.lock) > new Date()) || season.weeks.at(-1);
+  const byTeam = {}; for (const g of gym) (byTeam[g.team] ||= []).push(g.id);
+  const teams = Object.keys(byTeam).filter(t => byTeam[t].length >= 2).slice(0, 6);
+  const good = Object.fromEntries(SLOTS.map((s, i) => [s, byTeam[teams[i]][0]]));
+  const ts = new Date(new Date(open.lock).getTime() - 864e5).toISOString();
+  const submit = (lineup, schema = 2) => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema, season: season.season, week: open.week, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
+  const ok = await submit(good);
+  assert.deepEqual(ok.errors, []);
+  assert.equal(ok.record.schema, 2);
+  const mate = byTeam[teams[0]][1];
+  const bad = await submit({ ...good, aa: mate });
+  assert.deepEqual(bad.errors, [`2 picks from ${teams[0]} (Vault: ${good.vault}, All-Around: ${mate}). Max 1 per team per lineup.`]);
+  const twice = await submit({ ...good, aa: good.vault });
+  assert.equal(twice.errors[0], `${good.vault} is in 2 slots (Vault, All-Around). A gymnast can fill one slot.`);
+  const v1 = await submit({ vault: [good.vault], bars: [], beam: [], floor: [] }, undefined);
+  assert.match(v1.errors.join(' '), /^Old format/);
+  const wrongSchema = await submit(good, 3);
+  assert.deepEqual(wrongSchema.errors, ['Lineup schema 3 is not supported. Current schema is 2. Rebuild it in the builder.']);
 });
 
 test('RTN meet results map to gymnast ids', () => {
@@ -65,40 +115,14 @@ test('RTN meet results map to gymnast ids', () => {
   assert.deepEqual(meetsInWindow(sched, '2026-02-13', '2026-02-19', new Set(['Utah'])).map(m => m.meet_id), [1]);
 });
 
-test('max one gymnast per team per event; same team fine across events', async () => {
-  const { MAX_PER_TEAM_PER_EVENT } = await import('../lib/config.mjs');
-  assert.equal(MAX_PER_TEAM_PER_EVENT, 1);
-  const team = { a: 'Oklahoma', b: 'Oklahoma', c: 'LSU', d: 'Utah', e: 'UCLA', f: 'Florida', g: 'Georgia' };
-  const ids = new Set(Object.keys(team));
-  const ok = { vault: ['a', 'c', 'd', 'e', 'f'], bars: ['b', 'c', 'd', 'e', 'f'], beam: ['a', 'c', 'd', 'e', 'g'], floor: ['b', 'c', 'd', 'f', 'g'] };
-  assert.deepEqual(validateLineup(ok, ids, team), []);
-  const bad = { ...ok, beam: ['a', 'b', 'c', 'd', 'e'] };
-  assert.deepEqual(validateLineup(bad, ids, team), ['Beam: 2 picks from Oklahoma (a, b). Max 1 per team per event.']);
-  assert.deepEqual(validateLineup(bad, ids, new Map(Object.entries(team))), ['Beam: 2 picks from Oklahoma (a, b). Max 1 per team per event.']);
-  assert.deepEqual(validateLineup(bad, ids, team, 2), []);          // constant is configurable
-  assert.deepEqual(validateLineup(bad, ids), []);                    // no team map -> rule not applied
-});
-
-test('lineup processor rejects a same-team event with the exact error', async () => {
-  const { processSubmission } = await import('../process-lineup.mjs');
-  const { readFileSync } = await import('node:fs');
-  const gym = JSON.parse(readFileSync(new URL('../../data/gymnasts.json', import.meta.url))).gymnasts;
-  const season = JSON.parse(readFileSync(new URL('../../data/season.json', import.meta.url)));
-  const open = season.weeks.find(w => new Date(w.lock) > new Date()) || season.weeks.at(-1);
-  // 5 teams with >= 2 gymnasts; take the first gymnast of each, plus a second from team 0
-  const byTeam = {}; for (const g of gym) (byTeam[g.team] ||= []).push(g.id);
-  const teams = Object.keys(byTeam).filter(t => byTeam[t].length >= 2).slice(0, 5);
-  const five = teams.map(t => byTeam[t][0]);
-  const lineup = { vault: five, bars: five, beam: five, floor: [...five.slice(0, 4), byTeam[teams[0]][1]] };
-  const body = '```json\n' + JSON.stringify({ season: season.season, week: open.week, lineup }) + '\n```';
-  const ts = new Date(new Date(open.lock).getTime() - 864e5).toISOString();
-  const res = await processSubmission({ issue: { body, user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
-  assert.equal(res.ok, false);
-  assert.deepEqual(res.errors, [`Floor: 2 picks from ${teams[0]} (${byTeam[teams[0]][0]}, ${byTeam[teams[0]][1]}). Max 1 per team per event.`]);
-  const sixth = Object.keys(byTeam).find(t => !teams.includes(t));
-  const okLineup = { ...lineup, floor: [...five.slice(0, 4), byTeam[sixth][0]] };
-  const okBody = '```json\n' + JSON.stringify({ season: season.season, week: open.week, lineup: okLineup }) + '\n```';
-  const good = await processSubmission({ issue: { body: okBody, user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
-  assert.deepEqual(good.errors, []);
-  assert.equal(good.ok, true);
+test('DEMO lineups comply and are scored on the new format', () => {
+  const r = JSON.parse(readFileSync(new URL('../../data/results/demo/1.json', import.meta.url)));
+  assert.equal(r.players.length, 5);
+  for (const p of r.players) {
+    assert.deepEqual(Object.keys(p.slots), SLOTS);
+    const teams = Object.values(p.slots).map(s => s.team);
+    assert.equal(new Set(teams).size, 5, `${p.login} repeats a team`);
+    assert.equal(new Set(Object.values(p.slots).map(s => s.id)).size, 5);
+  }
+  assert.ok(r.players.some(p => Object.values(p.slots).some(s => !s.competed)), 'bye-week example has a DNC');
 });

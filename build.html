@@ -18,16 +18,16 @@
   <div id="banner" class="banner" hidden></div>
   <h2 id="title">Build lineup</h2>
   <p class="sub" id="wkline"></p>
-  <div class="board" id="board"></div>
+  <p class="sub"><b>Five picks.</b> One each on Vault, Bars, Beam and Floor (her score on that event), plus one All-Around (her AA total from a meet where she did all four). Five different teams. A gymnast fills one slot.</p>
+  <div class="card" style="padding:10px" id="board"></div>
   <div class="card" style="margin-top:12px">
     <h3>Submit</h3>
-    <p class="sub"><b>One per team per event:</b> each event's 5 picks come from 5 different teams. Same-team gymnasts are greyed out in the picker.</p>
-    <p class="sub">"Submit with GitHub" opens a pre-filled issue on <a href="https://github.com/thefivegym/fantasy-five/issues">thefivegym/fantasy-five</a>. Sign in to GitHub if asked, then press <b>Create</b> / <b>Submit new issue</b>. A bot validates it within a minute or two, saves it, comments, and closes the issue. Your GitHub login is your player name. Resubmitting before the lock replaces your lineup. Issues are public, so your picks are visible once submitted.</p>
-    <details><summary class="sub">Lineup JSON (for manual submission)</summary><textarea class="json" id="json" readonly></textarea></details>
+    <p class="sub">"Submit with GitHub" opens a pre-filled issue on <a href="https://github.com/thefivegym/fantasy-five/issues">thefivegym/fantasy-five</a>. Sign in to GitHub if asked, then press <b>Create</b>. A bot validates it within a minute or two, saves it, comments, and closes the issue. Your GitHub login is your player name. Resubmitting before the lock replaces your lineup. Issues are public, so your picks are visible once submitted.</p>
+    <details><summary class="sub">Lineup JSON (schema 2, for manual submission)</summary><textarea class="json" id="json" readonly></textarea></details>
   </div>
 </main>
 <div class="sticky-bar"><div class="wrap">
-  <div><div class="sub">Projected total (2026 NQS; no projection = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/20</span></div></div>
+  <div><div class="sub">Projected total (2026 NQS; no projection = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/5</span></div></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn small" id="clear">Clear</button>
     <a class="btn primary" id="submit" href="#" aria-disabled="true">Submit with GitHub</a>
@@ -50,94 +50,101 @@ FF.chrome('build.html');
   const $ = id => document.getElementById(id);
   const s = await FF.season();
   const G = await FF.gymnasts();
-  const MAX_TEAM = (await FF.config()).MAX_PER_TEAM_PER_EVENT;
-  const teamCount = (ev, skipIdx = -1) => { const c = {}; L[ev].forEach((id, i) => { if (id && i !== skipIdx && G._byId[id]) { const t = G._byId[id].team; c[t] = (c[t] || 0) + 1; } }); return c; };
+  const C = await FF.config();
+  const MAX_TEAM = C.MAX_PER_TEAM_PER_LINEUP, SCHEMA = C.LINEUP_SCHEMA, SLOTS = C.SLOTS;
   const teams = (await FF.json('data/teams.json')).teams.filter(t => t.roster_count);
   teams.forEach(t => $('pteam').insertAdjacentHTML('beforeend', `<option value="${FF.esc(t.id)}">${FF.esc(t.name)}</option>`));
   const w = FF.openWeek(s);
-  if (!w) { $('title').textContent = 'Build lineup'; $('wkline').textContent = 'No week is open for lineups right now.'; }
+  if (!w) $('wkline').textContent = 'No week is open for lineups right now.';
   else {
     $('title').textContent = `Build lineup · ${w.label || 'Week ' + w.week} · ${s.season}`;
     const tick = () => { $('wkline').textContent = `${FF.fmtDate(w.start)} – ${FF.fmtDate(w.end)}. Locks ${FF.fmtCT(w.lock)} (${FF.countdown(new Date(w.lock) - Date.now())}).`; };
     tick(); setInterval(tick, 1000);
   }
-  const KEY = `ff5:lineup:${s.season}:${w ? w.week : 'none'}`;
-  let L;
-  try { L = JSON.parse(localStorage.getItem(KEY)) || null; } catch { L = null; }
-  if (!L) { // carry over last week's picks if any
-    try { const last = Object.keys(localStorage).filter(k => k.startsWith(`ff5:lineup:${s.season}:`)).sort().pop(); L = last ? JSON.parse(localStorage.getItem(last)) : null; } catch {}
-  }
-  L = L || {};
-  for (const ev of FF.EVENTS) { L[ev] = (L[ev] || []).filter(id => G._byId[id]).slice(0, 5); while (L[ev].length < 5) L[ev].push(null); }
+  const PREFIX = `ff5v${SCHEMA}:lineup:${s.season}:`;
+  const KEY = PREFIX + (w ? w.week : 'none');
+  let L = null;
+  try { L = JSON.parse(localStorage.getItem(KEY)); } catch {}
+  if (!L) { try { const last = Object.keys(localStorage).filter(k => k.startsWith(PREFIX)).sort().pop(); L = last ? JSON.parse(localStorage.getItem(last)) : null; } catch {} }
+  L = Object.fromEntries(SLOTS.map(k => [k, L && typeof L[k] === 'string' && G._byId[L[k]] ? L[k] : null]));
   const save = () => localStorage.setItem(KEY, JSON.stringify(L));
+  const teamOf = id => G._byId[id]?.team;
+  /** teams used by the other slots -> slot names */
+  const usedTeams = (skip) => { const m = {}; for (const k of SLOTS) if (k !== skip && L[k]) (m[teamOf(L[k])] ||= []).push(k); return m; };
 
   function errors() {
     const e = [];
-    for (const ev of FF.EVENTS) {
-      const ids = L[ev].filter(Boolean);
-      if (ids.length < 5) e.push(`${FF.EV_NAME[ev]}: ${5 - ids.length} slot${ids.length === 4 ? '' : 's'} empty.`);
-      if (new Set(ids).size !== ids.length) e.push(`${FF.EV_NAME[ev]}: same gymnast twice.`);
-      for (const [t, n] of Object.entries(teamCount(ev))) if (n > MAX_TEAM) e.push(`${FF.EV_NAME[ev]}: already have ${MAX_TEAM === 1 ? 'one' : MAX_TEAM} from ${t}. Max ${MAX_TEAM} per team per event.`);
-    }
+    const empty = SLOTS.filter(k => !L[k]);
+    if (empty.length) e.push(`Empty: ${empty.map(k => FF.EV_NAME[k]).join(', ')}.`);
+    const ids = {}; for (const k of SLOTS) if (L[k]) (ids[L[k]] ||= []).push(k);
+    for (const [id, ks] of Object.entries(ids)) if (ks.length > 1) e.push(`${G._byId[id].name} is in ${ks.map(k => FF.EV_NAME[k]).join(' and ')}. One slot per gymnast.`);
+    for (const [t, ks] of Object.entries(usedTeams(null))) if (ks.length > MAX_TEAM) e.push(`${FF.EV_NAME[ks[1]]}: already have one from ${t} (${FF.EV_NAME[ks[0]]}). Max ${MAX_TEAM} per team per lineup.`);
     if (!w) e.push('No open week.');
     else if (Date.now() >= new Date(w.lock)) e.push('This week is locked.');
     return e;
   }
   function render() {
     let tot = 0, n = 0;
-    $('board').innerHTML = FF.EVENTS.map(ev => {
-      let sub = 0;
-      const tc = teamCount(ev);
-      const slots = L[ev].map((id, i) => {
-        const g = id && G._byId[id];
-        if (!g) return `<button class="slot" data-ev="${ev}" data-i="${i}"><span class="nm muted">+ Pick slot ${i + 1}</span></button>`;
-        const p = FF.proj(g, ev); sub += p || 0; n++;
-        const clash = tc[g.team] > MAX_TEAM;
-        return `<div class="slot filled${clash ? ' clash' : ''}" title="${clash ? FF.esc(`Second pick from ${g.team} on ${FF.EV_NAME[ev]}`) : ''}" data-ev="${ev}" data-i="${i}" role="button" tabindex="0"><span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? FF.noProj(g) : FF.f3(p)}</span><button class="x" data-x="${ev}:${i}" aria-label="Remove">×</button></div>`;
-      }).join('');
-      tot += sub;
-      return `<section class="evcol"><h3><span>${FF.EV_NAME[ev]}</span><span class="num muted">${sub.toFixed(3)}</span></h3>${slots}</section>`;
+    const ut = usedTeams(null);
+    $('board').innerHTML = SLOTS.map(k => {
+      const id = L[k], g = id && G._byId[id];
+      const label = `<span class="slotlab">${FF.EV_SHORT[k]}</span>`;
+      if (!g) return `<button class="slot" data-k="${k}">${label}<span class="nm muted">+ Pick ${FF.EV_NAME[k]}</span></button>`;
+      const p = FF.proj(g, k); tot += p || 0; n++;
+      const clash = ut[g.team].length > MAX_TEAM || SLOTS.filter(x => L[x] === id).length > 1;
+      return `<div class="slot filled${clash ? ' clash' : ''}" data-k="${k}" role="button" tabindex="0">${label}<span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? FF.noProj(g, k) : FF.f3(p)}</span><button class="x" data-x="${k}" aria-label="Remove">×</button></div>`;
     }).join('');
     $('ptotal').textContent = tot.toFixed(3);
-    $('filled').textContent = `${n}/20`;
+    $('filled').textContent = `${n}/5`;
     const errs = errors();
     $('errors').innerHTML = errs.map(x => `<li>${FF.esc(x)}</li>`).join('');
-    const payload = { game: 'fantasy-five', season: s.season, week: w ? w.week : null, lineup: Object.fromEntries(FF.EVENTS.map(ev => [ev, L[ev]])) };
+    const payload = { game: 'fantasy-five', schema: SCHEMA, season: s.season, week: w ? w.week : null, lineup: L };
     $('json').value = JSON.stringify(payload);
     const a = $('submit');
     if (errs.length) { a.setAttribute('aria-disabled', 'true'); a.style.opacity = .45; a.removeAttribute('target'); a.href = '#'; }
     else {
-      const lines = FF.EVENTS.map(ev => `${FF.EV_SHORT[ev]}: ${L[ev].map(id => G._byId[id].name + ' (' + G._byId[id].team + ')').join(', ')}`);
-      const body = `<!-- Fantasy Five lineup. Press "Create" to submit. Don't edit the JSON block. -->\nSeason ${s.season} · ${w.label || 'Week ' + w.week} · locks ${FF.fmtCT(w.lock)}\n\n${lines.join('\n')}\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n`;
+      const lines = SLOTS.map(k => `${FF.EV_SHORT[k]}: ${G._byId[L[k]].name} (${G._byId[L[k]].team})`);
+      const body = `<!-- Fantasy Five lineup (schema ${SCHEMA}). Press "Create" to submit. Don't edit the JSON block. -->\nSeason ${s.season} · ${w.label || 'Week ' + w.week} · locks ${FF.fmtCT(w.lock)}\n\n${lines.join('\n')}\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n`;
       const title = `Lineup: ${s.season} week ${w.week}`;
       a.href = `https://github.com/${FF.REPO}/issues/new?template=lineup.md&labels=lineup&title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
       a.target = '_blank'; a.rel = 'noopener'; a.setAttribute('aria-disabled', 'false'); a.style.opacity = 1;
     }
   }
   $('submit').addEventListener('click', e => { if ($('submit').getAttribute('aria-disabled') === 'true') e.preventDefault(); });
-  $('clear').onclick = () => { if (confirm('Clear all 20 slots?')) { FF.EVENTS.forEach(ev => L[ev] = [null, null, null, null, null]); save(); render(); } };
+  $('clear').onclick = () => { if (confirm('Clear all 5 picks?')) { SLOTS.forEach(k => L[k] = null); save(); render(); } };
 
   let cur = null;
   $('board').addEventListener('click', e => {
     const x = e.target.closest('[data-x]');
-    if (x) { const [ev, i] = x.dataset.x.split(':'); L[ev][i] = null; save(); render(); e.stopPropagation(); return; }
+    if (x) { L[x.dataset.x] = null; save(); render(); e.stopPropagation(); return; }
     const sl = e.target.closest('.slot'); if (!sl) return;
-    cur = { ev: sl.dataset.ev, i: +sl.dataset.i };
-    $('ptitle').textContent = `${FF.EV_NAME[cur.ev]} · slot ${cur.i + 1}`;
+    cur = sl.dataset.k;
+    $('ptitle').textContent = `${FF.EV_NAME[cur]}${cur === 'aa' ? ' · sorted by 2026 AA NQS' : ''}`;
     $('pq').value = ''; plist(); $('picker').showModal(); $('pq').focus();
   });
+  function blockReason(g) {
+    const other = SLOTS.find(k => k !== cur && L[k] === g.id);
+    if (other) return `already your ${FF.EV_NAME[other]} pick`;
+    const ut = usedTeams(cur)[g.team];
+    if (ut && ut.length >= MAX_TEAM) return `already have one from ${g.team} (${FF.EV_NAME[ut[0]]})`;
+    return null;
+  }
   function plist() {
-    const q = $('pq').value.trim().toLowerCase(), team = $('pteam').value, ev = cur.ev;
-    const taken = new Set(L[ev].filter(Boolean));
-    const tc = teamCount(ev, cur.i);   // teams already used on this event, ignoring the slot being replaced
+    const q = $('pq').value.trim().toLowerCase(), team = $('pteam').value, k = cur;
     let rows = G.gymnasts.filter(g => (!team || g.team_id === team) && (!q || (g.name + ' ' + g.team).toLowerCase().includes(q)));
-    rows.sort((a, b) => (FF.proj(b, ev) ?? -1) - (FF.proj(a, ev) ?? -1) || a.name.localeCompare(b.name));
-    $('plist').innerHTML = rows.slice(0, 200).map(g => { const p = g.proj?.[ev]; const full = (tc[g.team] || 0) >= MAX_TEAM; return `<button class="row" data-id="${FF.esc(g.id)}" ${taken.has(g.id) || full ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}${full && !taken.has(g.id) ? ` · already have one from ${FF.esc(g.team)}` : ''}</span></span><span class="num sub">${p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)}` : FF.noProj(g)}</span></button>`; }).join('') + (rows.length > 200 ? `<div class="sub" style="padding:10px">${rows.length - 200} more. Search to narrow.</div>` : '');
+    rows.sort((a, b) => (FF.proj(b, k) ?? -1) - (FF.proj(a, k) ?? -1) || a.name.localeCompare(b.name));
+    $('plist').innerHTML = rows.slice(0, 200).map(g => {
+      const p = g.proj?.[k], why = blockReason(g);
+      return `<button class="row" data-id="${FF.esc(g.id)}" ${why ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}${why ? ' · ' + FF.esc(why) : ''}</span></span><span class="num sub">${p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)} · high ${FF.f3(p.high)}` : FF.noProj(g, k)}</span></button>`;
+    }).join('') + (rows.length > 200 ? `<div class="sub" style="padding:10px">${rows.length - 200} more. Search to narrow.</div>` : '');
   }
   $('pq').addEventListener('input', plist); $('pteam').addEventListener('input', plist);
-  $('plist').addEventListener('click', e => { const r = e.target.closest('.row'); if (!r || r.disabled) return;
-    const g = G._byId[r.dataset.id];
-    if ((teamCount(cur.ev, cur.i)[g.team] || 0) >= MAX_TEAM) { alert(`${FF.EV_NAME[cur.ev]}: already have one from ${g.team}.`); return; } L[cur.ev][cur.i] = r.dataset.id; save(); render(); $('picker').close(); });
+  $('plist').addEventListener('click', e => {
+    const r = e.target.closest('.row'); if (!r || r.disabled) return;
+    const g = G._byId[r.dataset.id], why = blockReason(g);
+    if (why) { alert(`${FF.EV_NAME[cur]}: ${why}.`); return; }
+    L[cur] = g.id; save(); render(); $('picker').close();
+  });
   $('pclose').onclick = () => $('picker').close();
   render();
 })().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load data: ' + e.message; });

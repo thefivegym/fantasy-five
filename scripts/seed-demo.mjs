@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Builds the sample DEMO-* lineups for the DEMO week. Picks use only pre-known information
-// (2026 RTN rankings + which teams were scheduled that week), never the week's actual scores.
+// Builds the 5 sample DEMO-* lineups (schema 2: one pick each for VT, UB, BB, FX, AA) for the DEMO week.
+// Picks use only 2026 RTN rankings + which teams were scheduled that week, never the week's actual scores.
 import { join } from 'node:path';
 import { DATA, ROOT, readJson, writeJson, loadSeason } from './lib/io.mjs';
-import { EVENTS, MAX_PER_TEAM_PER_EVENT } from './lib/config.mjs';
+import { SLOTS, LINEUP_SCHEMA, MAX_PER_TEAM_PER_LINEUP } from './lib/config.mjs';
 import { validateLineup } from './lib/scoring.mjs';
 
 const season = await loadSeason('demo');
@@ -14,31 +14,43 @@ const playing = new Set(scores.meets.flatMap(m => m.teams));
 const teams = (await readJson(join(DATA, 'teams.json'))).teams;
 const conf = Object.fromEntries(teams.map(t => [t.name, t.conference]));
 const POWER = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
-const nqs = (g, ev) => g.proj?.[ev]?.nqs ?? null;
-const pool = (ev, filter = () => true) => roster.filter(g => nqs(g, ev) != null && filter(g)).sort((a, b) => nqs(b, ev) - nqs(a, ev) || a.id.localeCompare(b.id));
-// Take gymnasts in order, skipping any whose team already has MAX_PER_TEAM_PER_EVENT picks on this event.
-const take = (list, n, seed = []) => {
-  const out = [...seed], cnt = {};
-  for (const g of out) cnt[g.team] = (cnt[g.team] || 0) + 1;
-  for (const g of list) { if (out.length >= n) break; if ((cnt[g.team] || 0) >= MAX_PER_TEAM_PER_EVENT || out.includes(g)) continue; out.push(g); cnt[g.team] = (cnt[g.team] || 0) + 1; }
-  return out;
-};
+const nqs = (g, s) => g.proj?.[s]?.nqs ?? null;
+const pool = (s, filter = () => true) => roster.filter(g => nqs(g, s) != null && filter(g)).sort((a, b) => nqs(b, s) - nqs(a, s) || a.id.localeCompare(b.id));
+// Fill slots in this order (AA first: the scarcest pool), skipping used gymnasts and full teams.
+const ORDER = ['aa', 'vault', 'bars', 'beam', 'floor'];
+function build(candidates) {           // candidates(slot) -> ordered list
+  const lineup = {}, used = new Set(), teamN = {};
+  for (const s of ORDER) {
+    const g = candidates(s).find(g => !used.has(g.id) && (teamN[g.team] || 0) < MAX_PER_TEAM_PER_LINEUP);
+    if (!g) throw new Error(`no candidate for ${s}`);
+    lineup[s] = g.id; used.add(g.id); teamN[g.team] = (teamN[g.team] || 0) + 1;
+  }
+  return Object.fromEntries(SLOTS.map(s => [s, lineup[s]]));
+}
+const onSched = g => playing.has(g.team);
+const chalk = build(s => pool(s, onSched));
+const chalkIds = new Set(Object.values(chalk));
 const strategies = {
-  'DEMO-chalk': ev => take(pool(ev, g => playing.has(g.team)), 5),
-  'DEMO-next-five': ev => { const chalk = new Set(take(pool(ev, g => playing.has(g.team)), 5)); return take(pool(ev, g => playing.has(g.team) && !chalk.has(g)), 5); },
-  'DEMO-mid-major': ev => take(pool(ev, g => playing.has(g.team) && !POWER.has(conf[g.team])), 5),
-  'DEMO-ceiling': ev => take(pool(ev, g => playing.has(g.team)).slice(20).sort((a, b) => (b.proj[ev].high ?? 0) - (a.proj[ev].high ?? 0) || nqs(b, ev) - nqs(a, ev)), 5),
-  // chalk, but the 5th slot goes to the best gymnast whose team had a bye: shows the DNC = 0 rule
-  'DEMO-bye-week': ev => take(pool(ev, g => !playing.has(g.team)), 5, take(pool(ev, g => playing.has(g.team)), 4)),
+  'DEMO-chalk': chalk,
+  'DEMO-next-five': build(s => pool(s, g => onSched(g) && !chalkIds.has(g.id))),
+  'DEMO-mid-major': build(s => pool(s, g => onSched(g) && !POWER.has(conf[g.team]))),
+  'DEMO-ceiling': build(s => pool(s, onSched).slice(s === 'aa' ? 5 : 20).sort((a, b) => (b.proj[s].high ?? 0) - (a.proj[s].high ?? 0) || nqs(b, s) - nqs(a, s))),
+  // chalk, but Floor goes to the best floor worker whose team had a bye: shows the DNC = 0 rule
+  'DEMO-bye-week': (() => {
+    const L = { ...chalk };
+    const teamsUsed = new Set(Object.entries(L).filter(([s]) => s !== 'floor').map(([, id]) => roster.find(g => g.id === id).team));
+    L.floor = pool('floor', g => !onSched(g) && !teamsUsed.has(g.team))[0].id;
+    return L;
+  })(),
 };
-for (const [login, pick] of Object.entries(strategies)) {
-  const lineup = Object.fromEntries(EVENTS.map(ev => [ev, pick(ev).map(g => g.id)]));
-  const errs = validateLineup(lineup, new Set(roster.map(g => g.id)), new Map(roster.map(g => [g.id, g.team])));
+const ids = new Set(roster.map(g => g.id)), teamOf = new Map(roster.map(g => [g.id, g.team]));
+for (const [login, lineup] of Object.entries(strategies)) {
+  const errs = validateLineup(lineup, ids, teamOf);
   if (errs.length) throw new Error(`${login}: ${errs.join(' ')}`);
   await writeJson(join(DATA, 'lineups', 'demo', String(week.week), `${login.toLowerCase()}.json`), {
-    login, season: 'demo', week: week.week, demo: true, submitted_at: '2026-02-13T22:00:00Z',
+    schema: LINEUP_SCHEMA, login, season: 'demo', week: week.week, demo: true, submitted_at: '2026-02-13T22:00:00Z',
     note: 'Sample DEMO lineup generated by scripts/seed-demo.mjs from 2026 RTN rankings and the week schedule.',
     lineup,
   });
-  console.log('wrote', login);
+  console.log('wrote', login, JSON.stringify(lineup));
 }

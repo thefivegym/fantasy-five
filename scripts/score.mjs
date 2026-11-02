@@ -34,7 +34,7 @@ export async function scoreSeason(seasonId) {
     if (!weekScores) continue;                       // week not played / not imported yet
     const lineups = await loadLineups(sid, w.week);
     const res = weekResults({ season: season.season, week: w.week, weekScores, lineups, mode: MULTI_MEET_MODE });
-    for (const p of res.players) for (const ev of Object.keys(p.events)) for (const sl of p.events[ev].slots) {
+    for (const p of res.players) for (const sl of Object.values(p.slots)) {
       const g = byId[sl.id]; sl.name = g?.name || sl.id; sl.team = g?.team || null;
     }
     res.demo = season.demo === true;

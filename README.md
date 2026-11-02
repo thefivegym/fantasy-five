@@ -5,20 +5,22 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 
 **Play:** https://thefivegym.github.io/fantasy-five/
 
-## Rules
+## Rules (lineup schema 2)
 
-- Each week, pick exactly **5 gymnasts per event** (vault, bars, beam, floor) from anywhere in D1. 20 slots.
-  A gymnast can fill more than one event, but only once per event.
-- **One gymnast per team per event.** Within vault, bars, beam or floor, the 5 picks must come from 5 different
-  teams (`MAX_PER_TEAM_PER_EVENT = 1` in `scripts/lib/config.mjs`). The same team, or the same gymnast, can
-  appear again on a different event.
-- **Slot score** = her real score on that event that week. Competes more than once: **best score** counts
-  (`MULTI_MEET_MODE` in `scripts/lib/config.mjs`; set to `'average'` to use the mean). Doesn't compete: **0**.
-- **Team total** = sum of all 20 slots. No drops.
+- Each week, pick **5 gymnasts**, one per slot, from anywhere in D1:
+  **Vault, Bars, Beam, Floor** (her score on that event) and **All-Around** (her AA total).
+- **AA** only counts from a meet where she competed all four events; the total is the sum of her four scores
+  in that meet. No all-four meet that week: the AA slot scores 0.
+- **Five different teams:** `MAX_PER_TEAM_PER_LINEUP = 1`. **One slot per gymnast:** `MAX_USES_PER_GYMNAST = 1`.
+  Both in `scripts/lib/config.mjs`.
+- Competes more than once: **best** single event score, or best AA total, counts (`MULTI_MEET_MODE`; set to
+  `'average'` for the mean). Doesn't compete that slot: **0**.
+- **Team total** = the 5 scores added up (4 event scores + 1 AA, about an 80-point scale).
 - A week runs **Friday through Thursday** (America/Chicago dates). Lineups **lock** at the week's `lock`
   timestamp in `data/season.json` (default Friday 5:00 PM CT, before the first meet). Every D1 meet dated in
   the window counts.
 - Highest weekly total wins the week. The season leaderboard is the sum of weekly totals.
+- Schema 1 (5 per event, 20 slots) is retired; the workflow rejects it with "Old format".
 
 ## How a lineup gets in (GitHub sign-in, static site)
 
@@ -27,8 +29,8 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 2. The player submits the issue while signed in to GitHub. Their **GitHub login is their username**.
 3. `.github/workflows/lineup.yml` runs on `issues: opened, edited` when the issue has the `lineup` label or a
    title starting `Lineup:`. `scripts/process-lineup.mjs` parses the JSON block and checks:
-   the season and week exist and the week is the open one; exactly 5 unique gymnast ids per event; every id is
-   in `data/gymnasts.json`; no more than `MAX_PER_TEAM_PER_EVENT` picks from one team on an event; the issue's `created_at` (or `updated_at` for an edit) is before that week's lock.
+   `schema` is 2; the season and week exist and the week is the open one; all 5 slots filled; every id is in
+   `data/gymnasts.json`; no gymnast in two slots; no more than `MAX_PER_TEAM_PER_LINEUP` picks from one team; the issue's `created_at` (or `updated_at` for an edit) is before that week's lock.
 4. Valid: writes `data/lineups/<season>/<week>/<login>.json` (a later valid submission replaces it), commits,
    comments a dry confirmation, closes the issue, redeploys Pages. Invalid: comments the exact errors and
    closes the issue as "not planned". Nothing is saved.
@@ -56,17 +58,17 @@ and run `node scripts/score.mjs`.
 
 | File | Contents |
 |---|---|
-| `data/gymnasts.json` | `{generated_at, sources, coverage, gymnasts:[…]}`. Gymnast: `id` (stable slug, `first-last`, `-team` on a name clash), `name`, `team`, `team_id`, `class_year`, `hometown`, `rtn_ids` (Road to Nationals gymnast ids), `prev_team` (2026 team), `events` (events she competed in 2026, or null), `proj` (`{vault:{avg,nqs,high,rank},…}` from 2026, or null), `projection_status` (`ranked` / `unranked-2026` / `none`), `projection_note`. |
+| `data/gymnasts.json` | `{generated_at, sources, coverage, gymnasts:[…]}`. Gymnast: `id` (stable slug, `first-last`, `-team` on a name clash), `name`, `team`, `team_id`, `class_year`, `hometown`, `rtn_ids` (Road to Nationals gymnast ids), `prev_team` (2026 team), `events` (events she competed in 2026, or null), `proj` (`{vault|bars|beam|floor|aa:{avg,nqs,high,rank}}` from 2026, or null), `projection_status` (`ranked` / `unranked-2026` / `none`), `projection_note`. |
 | `data/teams.json` | D1 teams: `id`, `name`, `rtn_tid`, `conference`, `roster_url`, `roster_source` (parser), `roster_status` (`official-2026-27` or `provisional-rtn-2026`), `roster_count`, `note`. |
 | `data/season.json` | `season` (2027), `roster`, `week_rule`, `scoring`, `weeks:[{week,label,start,end,lock,status}]`, and a `demo` pointer. |
-| `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],…}}, unmatched:[…]}` |
-| `data/lineups/<season>/<week>/<login>.json` | `{login, season, week, submitted_at, issue, issue_url, lineup:{vault:[5 ids],bars,beam,floor}}`. A file with `"test": true` is ignored by scoring. |
-| `data/results/<season>/<week>.json` | `{mode, scores_status, players:[{login,rank,total,events:{vault:{total,slots:[{id,name,team,score,competed,meets}]}}}]}` |
+| `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],bars,beam,floor,aa:[{score,meet_id,date}]}}, unmatched:[…]}`. `aa` has one entry per meet where she has all four event scores (sum of the four); the scorer derives it if absent. |
+| `data/lineups/<season>/<week>/<login>.json` | `{schema: 2, login, season, week, submitted_at, issue, issue_url, lineup:{vault:id, bars:id, beam:id, floor:id, aa:id}}`. A file with `"test": true`, or any schema other than 2, is ignored by scoring. |
+| `data/results/<season>/<week>.json` | `{mode, schema, scores_status, players:[{login,rank,total,slots:{vault:{id,name,team,score,competed,meets},bars,beam,floor,aa}}]}` |
 | `data/leaderboard/<season>.json` | `{weeks, players:[{login,rank,total,weeks_played,best_week,weeks:{<n>:{total,rank,of}}}]}` |
 
 Projections are guidance only: 2026 season average (`avg`), 2026 final regular-season RQS used as NQS
 (`nqs`), and season high, from the RTN individual rankings
-(`/api/women/results/2026/12/1/<event>`). Gymnasts with no 2026 NCAA record (freshmen, unmatched newcomers) have
+(`/api/women/results/2026/12/1/<event>`, 1–4 = VT/UB/BB/FX, 5 = AA). Gymnasts not in the 2026 AA rankings (fewer than the RQS minimum of AA meets) show "no AA history" on the AA slot and have no `proj.aa`. Gymnasts with no 2026 NCAA record (freshmen, unmatched newcomers) have
 `proj: null` and show as NEW. Gymnasts who competed in 2026 but not often enough to get an RQS are
 `unranked-2026`, also `proj: null`. Nothing is estimated.
 
@@ -96,7 +98,7 @@ index.html roster.html build.html leaderboard.html player.html card.html   site 
 assets/style.css assets/common.js                                          shared style + helpers
 scripts/lib/{config,scoring,io,names}.mjs                                  game constants + scoring engine
 scripts/process-lineup.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
-scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups (2026 RTN rankings + week schedule only)
+scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups, schema 2 (2026 RTN rankings + week schedule only)
 scripts/test/scoring.test.mjs                                               node --test scripts/test/*.test.mjs
 scripts/roster/                                                             offline roster builder
 .github/workflows/{lineup,score,deploy}.yml   .github/ISSUE_TEMPLATE/lineup.md

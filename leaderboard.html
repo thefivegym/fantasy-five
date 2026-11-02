@@ -58,8 +58,8 @@ FF.chrome('leaderboard.html');
     const w = s.weeks.find(x => String(x.week) === String(wk));
     $('title').textContent = `${FF.isDemo(s) ? 'DEMO · ' : ''}${w.label || 'Week ' + wk} · weekly`;
     $('meta').textContent = `${r.players.length} lineups · scores ${r.scores_status}${r.scores_generated_at ? ' as of ' + FF.fmtCT(r.scores_generated_at) : ''} · multi-meet rule: ${r.mode}`;
-    thead.innerHTML = `<tr><th class="n">#</th><th>Player</th>${FF.EVENTS.map(e => `<th class="n">${FF.EV_SHORT[e]}</th>`).join('')}<th class="n">Total</th><th></th></tr>`;
-    tbody.innerHTML = r.players.map(p => `<tr><td class="n">${p.rank}</td><td><a href="${FF.playerUrl(p.login, s)}">${FF.esc(p.login)}</a></td>${FF.EVENTS.map(e => `<td class="n">${FF.f3(p.events[e].total)}</td>`).join('')}<td class="n"><b>${FF.fTot(p.total)}</b></td><td><a class="btn small" href="${FF.cardUrl(p.login, wk, s)}">Card</a></td></tr>`).join('') || `<tr><td colspan="8" class="sub">No lineups.</td></tr>`;
+    thead.innerHTML = `<tr><th class="n">#</th><th>Player</th>${FF.SLOTS.map(e => `<th class="n">${FF.EV_SHORT[e]}</th>`).join('')}<th class="n">Total</th><th></th></tr>`;
+    tbody.innerHTML = r.players.map(p => `<tr><td class="n">${p.rank}</td><td><a href="${FF.playerUrl(p.login, s)}">${FF.esc(p.login)}</a></td>${FF.SLOTS.map(e => `<td class="n" title="${FF.esc(p.slots[e].name)} (${FF.esc(p.slots[e].team || '')})">${p.slots[e].competed ? FF.f3(p.slots[e].score) : '<span class="pill zero">0</span>'}</td>`).join('')}<td class="n"><b>${FF.fTot(p.total)}</b></td><td><a class="btn small" href="${FF.cardUrl(p.login, wk, s)}">Card</a></td></tr>`).join('') || `<tr><td colspan="9" class="sub">No lineups.</td></tr>`;
   }
   $('view').onchange = render; $('week').onchange = render;
   render();
