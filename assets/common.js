@@ -48,6 +48,9 @@ const FF = (() => {
     const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
     return (d ? `${d}d ` : '') + `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
   }
+  let cfg;
+  /** Game constants, imported from the same module the workflows use (scripts/lib/config.mjs). */
+  const config = async () => (cfg ||= await import(new URL('scripts/lib/config.mjs', location.href).href));
   async function gymnasts() {
     const g = await json('data/gymnasts.json');
     if (!g._byId) g._byId = Object.fromEntries(g.gymnasts.map(x => [x.id, x]));
@@ -83,5 +86,5 @@ const FF = (() => {
   const cardUrl = (login, week, s) => `card.html?${seasonParam(s)}u=${encodeURIComponent(login)}&week=${week}`;
   const isDemoLogin = l => /^DEMO-/i.test(l);
 
-  return { REPO, EVENTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, chrome, demoBanner, noProj, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
+  return { REPO, EVENTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
 })();

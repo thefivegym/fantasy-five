@@ -1,5 +1,5 @@
 // Scoring engine. Pure functions, no I/O, no dependencies.
-import { EVENTS, SLOTS_PER_EVENT, MULTI_MEET_MODE } from './config.mjs';
+import { EVENTS, SLOTS_PER_EVENT, MULTI_MEET_MODE, MAX_PER_TEAM_PER_EVENT } from './config.mjs';
 
 const r3 = x => Math.round(x * 1000) / 1000;
 
@@ -12,8 +12,12 @@ export function slotValue(entries, mode = MULTI_MEET_MODE) {
   throw new Error(`Unknown MULTI_MEET_MODE: ${mode}`);
 }
 
-/** Structural validation of a lineup object { vault:[ids], bars:[...], beam:[...], floor:[...] }. Returns error strings. */
-export function validateLineup(lineup, gymnastIds) {
+const EV_LABEL = { vault: 'Vault', bars: 'Bars', beam: 'Beam', floor: 'Floor' };
+
+/** Validation of a lineup object { vault:[ids], bars:[...], beam:[...], floor:[...] }. Returns error strings.
+ *  teamOf: optional Map/object id -> team name; enables the per-team-per-event limit. */
+export function validateLineup(lineup, gymnastIds, teamOf = null, maxPerTeam = MAX_PER_TEAM_PER_EVENT) {
+  const team = id => (teamOf instanceof Map ? teamOf.get(id) : teamOf?.[id]);
   const errs = [];
   if (!lineup || typeof lineup !== 'object') return ['Lineup is missing or not an object.'];
   for (const ev of EVENTS) {
@@ -26,6 +30,12 @@ export function validateLineup(lineup, gymnastIds) {
       if (seen.has(id)) errs.push(`${ev}: ${id} is picked twice.`);
       seen.add(id);
       if (gymnastIds && !gymnastIds.has(id)) errs.push(`${ev}: ${id} is not in data/gymnasts.json.`);
+    }
+    if (teamOf) {
+      const byTeam = new Map();
+      for (const id of new Set(ids.filter(x => typeof x === 'string'))) { const t = team(id); if (t) byTeam.set(t, [...(byTeam.get(t) || []), id]); }
+      for (const [t, list] of byTeam) if (list.length > maxPerTeam)
+        errs.push(`${EV_LABEL[ev]}: ${list.length} picks from ${t} (${list.join(', ')}). Max ${maxPerTeam} per team per event.`);
     }
   }
   const extra = Object.keys(lineup).filter(k => !EVENTS.includes(k));

@@ -64,3 +64,41 @@ test('RTN meet results map to gymnast ids', () => {
   const sched = { '2026-02-13': { meets: [{ meet_id: 1, home_teams: 'Utah', away_teams: 'BYU', time: '21:00:00' }, { meet_id: 2, home_teams: 'Cortland State', away_teams: 'Ithaca College' }] } };
   assert.deepEqual(meetsInWindow(sched, '2026-02-13', '2026-02-19', new Set(['Utah'])).map(m => m.meet_id), [1]);
 });
+
+test('max one gymnast per team per event; same team fine across events', async () => {
+  const { MAX_PER_TEAM_PER_EVENT } = await import('../lib/config.mjs');
+  assert.equal(MAX_PER_TEAM_PER_EVENT, 1);
+  const team = { a: 'Oklahoma', b: 'Oklahoma', c: 'LSU', d: 'Utah', e: 'UCLA', f: 'Florida', g: 'Georgia' };
+  const ids = new Set(Object.keys(team));
+  const ok = { vault: ['a', 'c', 'd', 'e', 'f'], bars: ['b', 'c', 'd', 'e', 'f'], beam: ['a', 'c', 'd', 'e', 'g'], floor: ['b', 'c', 'd', 'f', 'g'] };
+  assert.deepEqual(validateLineup(ok, ids, team), []);
+  const bad = { ...ok, beam: ['a', 'b', 'c', 'd', 'e'] };
+  assert.deepEqual(validateLineup(bad, ids, team), ['Beam: 2 picks from Oklahoma (a, b). Max 1 per team per event.']);
+  assert.deepEqual(validateLineup(bad, ids, new Map(Object.entries(team))), ['Beam: 2 picks from Oklahoma (a, b). Max 1 per team per event.']);
+  assert.deepEqual(validateLineup(bad, ids, team, 2), []);          // constant is configurable
+  assert.deepEqual(validateLineup(bad, ids), []);                    // no team map -> rule not applied
+});
+
+test('lineup processor rejects a same-team event with the exact error', async () => {
+  const { processSubmission } = await import('../process-lineup.mjs');
+  const { readFileSync } = await import('node:fs');
+  const gym = JSON.parse(readFileSync(new URL('../../data/gymnasts.json', import.meta.url))).gymnasts;
+  const season = JSON.parse(readFileSync(new URL('../../data/season.json', import.meta.url)));
+  const open = season.weeks.find(w => new Date(w.lock) > new Date()) || season.weeks.at(-1);
+  // 5 teams with >= 2 gymnasts; take the first gymnast of each, plus a second from team 0
+  const byTeam = {}; for (const g of gym) (byTeam[g.team] ||= []).push(g.id);
+  const teams = Object.keys(byTeam).filter(t => byTeam[t].length >= 2).slice(0, 5);
+  const five = teams.map(t => byTeam[t][0]);
+  const lineup = { vault: five, bars: five, beam: five, floor: [...five.slice(0, 4), byTeam[teams[0]][1]] };
+  const body = '```json\n' + JSON.stringify({ season: season.season, week: open.week, lineup }) + '\n```';
+  const ts = new Date(new Date(open.lock).getTime() - 864e5).toISOString();
+  const res = await processSubmission({ issue: { body, user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
+  assert.equal(res.ok, false);
+  assert.deepEqual(res.errors, [`Floor: 2 picks from ${teams[0]} (${byTeam[teams[0]][0]}, ${byTeam[teams[0]][1]}). Max 1 per team per event.`]);
+  const sixth = Object.keys(byTeam).find(t => !teams.includes(t));
+  const okLineup = { ...lineup, floor: [...five.slice(0, 4), byTeam[sixth][0]] };
+  const okBody = '```json\n' + JSON.stringify({ season: season.season, week: open.week, lineup: okLineup }) + '\n```';
+  const good = await processSubmission({ issue: { body: okBody, user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
+  assert.deepEqual(good.errors, []);
+  assert.equal(good.ok, true);
+});

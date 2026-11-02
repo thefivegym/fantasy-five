@@ -48,7 +48,7 @@ export async function processSubmission({ issue, action, now }) {
   if (open && Number(open.week) !== Number(week.week) && !errors.length) errors.push(`Week ${week.week} is not open yet. The open week is ${open.week} (locks ${fmtCT(open.lock)}).`);
   const gym = await readJson(join(DATA, 'gymnasts.json'));
   const ids = new Set(gym.gymnasts.map(g => g.id));
-  errors.push(...validateLineup(data.lineup, ids));
+  errors.push(...validateLineup(data.lineup, ids, new Map(gym.gymnasts.map(g => [g.id, g.team]))));
   if (errors.length) return { ok: false, errors, week: week.week, season: season.season };
   const login = issue.user.login;
   const record = {

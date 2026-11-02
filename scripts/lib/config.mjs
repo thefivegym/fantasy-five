@@ -2,6 +2,8 @@
 
 export const EVENTS = ['vault', 'bars', 'beam', 'floor'];
 export const SLOTS_PER_EVENT = 5;
+// Within one event, at most this many picks may come from the same team (across events, no limit).
+export const MAX_PER_TEAM_PER_EVENT = 1;
 
 // How a slot is scored when a gymnast competes an event more than once in a week.
 //   'best'    -> her highest score that week (v1 default)

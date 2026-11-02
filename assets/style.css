@@ -93,3 +93,4 @@ textarea.json { width: 100%; min-height: 120px; font: .78rem ui-monospace, monos
 .site-footer { border-top: 1px solid var(--line); padding: 16px 0 28px; font-size: .8rem; color: var(--muted); line-height: 1.55; }
 .site-footer p { margin: 4px 0; }
 canvas.cardcanvas { width: 100%; max-width: 540px; height: auto; border-radius: 12px; box-shadow: var(--shadow); display: block; }
+.slot.clash { border-color: var(--live); background: color-mix(in srgb, var(--live) 8%, transparent); }

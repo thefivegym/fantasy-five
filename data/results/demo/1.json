@@ -10,7 +10,7 @@
    "total": 198.65,
    "events": {
     "vault": {
-     "total": 49.475,
+     "total": 49.675,
      "slots": [
       {
        "id": "kailin-chio",
@@ -43,29 +43,29 @@
        "team": "UCLA"
       },
       {
-       "id": "mackenzie-estep",
-       "score": 9.825,
+       "id": "sage-kellerman",
+       "score": 9.9,
        "meets": [
-        31983
+        32657
        ],
        "competed": true,
-       "name": "Mackenzie Estep",
-       "team": "Oklahoma"
+       "name": "Sage Kellerman",
+       "team": "Michigan State"
       },
       {
-       "id": "keira-wells",
-       "score": 9.85,
+       "id": "azaraya-ra-akbar",
+       "score": 9.975,
        "meets": [
-        31983
+        31979
        ],
        "competed": true,
-       "name": "Keira Wells",
-       "team": "Oklahoma"
+       "name": "Azaraya Ra-Akbar",
+       "team": "Alabama"
       }
      ]
     },
     "bars": {
-     "total": 49.725,
+     "total": 49.625,
      "slots": [
       {
        "id": "chloe-lacoursiere",
@@ -75,16 +75,6 @@
        ],
        "competed": true,
        "name": "Chloe LaCoursiere",
-       "team": "Alabama"
-      },
-      {
-       "id": "azaraya-ra-akbar",
-       "score": 9.95,
-       "meets": [
-        31979
-       ],
-       "competed": true,
-       "name": "Azaraya Ra-Akbar",
        "team": "Alabama"
       },
       {
@@ -108,19 +98,29 @@
        "team": "UCLA"
       },
       {
-       "id": "riley-mccusker",
-       "score": 9.975,
+       "id": "tonya-paulsson",
+       "score": 9.875,
        "meets": [
-        31983
+        32024
        ],
        "competed": true,
-       "name": "Riley McCusker",
-       "team": "Florida"
+       "name": "Tonya Paulsson",
+       "team": "California"
+      },
+      {
+       "id": "chloe-cho",
+       "score": 9.95,
+       "meets": [
+        32044
+       ],
+       "competed": true,
+       "name": "Chloe Cho",
+       "team": "Illinois"
       }
      ]
     },
     "beam": {
-     "total": 49.65,
+     "total": 49.6,
      "slots": [
       {
        "id": "kailin-chio",
@@ -163,19 +163,19 @@
        "team": "UCLA"
       },
       {
-       "id": "ciena-alipio",
-       "score": 9.9,
+       "id": "joscelyn-roberson",
+       "score": 9.85,
        "meets": [
-        32012
+        31979
        ],
        "competed": true,
-       "name": "Ciena Alipio",
-       "team": "UCLA"
+       "name": "Joscelyn Roberson",
+       "team": "Arkansas"
       }
      ]
     },
     "floor": {
-     "total": 49.8,
+     "total": 49.75,
      "slots": [
       {
        "id": "jordan-chiles",
@@ -208,16 +208,6 @@
        "team": "LSU"
       },
       {
-       "id": "lily-smith",
-       "score": 9.975,
-       "meets": [
-        32024
-       ],
-       "competed": true,
-       "name": "Lily Smith",
-       "team": "Georgia"
-      },
-      {
        "id": "gabby-gladieux",
        "score": 9.975,
        "meets": [
@@ -226,6 +216,16 @@
        "competed": true,
        "name": "Gabby Gladieux",
        "team": "Alabama"
+      },
+      {
+       "id": "nikki-smith",
+       "score": 9.925,
+       "meets": [
+        32657
+       ],
+       "competed": true,
+       "name": "Nikki Smith",
+       "team": "Michigan State"
       }
      ]
     }
@@ -235,7 +235,7 @@
   },
   {
    "login": "DEMO-mid-major",
-   "total": 197.475,
+   "total": 197.625,
    "events": {
     "vault": {
      "total": 49.275,
@@ -293,7 +293,7 @@
      ]
     },
     "bars": {
-     "total": 49.4,
+     "total": 49.375,
      "slots": [
       {
        "id": "maggie-slife",
@@ -337,19 +337,19 @@
        "team": "Ball State"
       },
       {
-       "id": "luciana-alvarado-reid",
-       "score": 9.85,
+       "id": "ellie-weaver",
+       "score": 9.825,
        "meets": [
-        31969
+        32004
        ],
        "competed": true,
-       "name": "Luciana Alvarado-Reid",
-       "team": "Central Michigan"
+       "name": "Ellie Weaver",
+       "team": "Oregon State"
       }
      ]
     },
     "beam": {
-     "total": 49.325,
+     "total": 49.45,
      "slots": [
       {
        "id": "maggie-slife",
@@ -359,16 +359,6 @@
        ],
        "competed": true,
        "name": "Maggie Slife",
-       "team": "Air Force"
-      },
-      {
-       "id": "alyssa-bigler",
-       "score": 9.775,
-       "meets": [
-        32024
-       ],
-       "competed": true,
-       "name": "Alyssa Bigler",
        "team": "Air Force"
       },
       {
@@ -400,11 +390,21 @@
        "competed": true,
        "name": "Ashley Szymanski",
        "team": "Ball State"
+      },
+      {
+       "id": "mia-hampton",
+       "score": 9.9,
+       "meets": [
+        32004
+       ],
+       "competed": true,
+       "name": "Mia Hampton",
+       "team": "Southern Utah"
       }
      ]
     },
     "floor": {
-     "total": 49.475,
+     "total": 49.525,
      "slots": [
       {
        "id": "sophia-esposito",
@@ -437,16 +437,6 @@
        "team": "Southern Utah"
       },
       {
-       "id": "alyssa-bigler",
-       "score": 9.825,
-       "meets": [
-        32024
-       ],
-       "competed": true,
-       "name": "Alyssa Bigler",
-       "team": "Air Force"
-      },
-      {
        "id": "luciana-alvarado-reid",
        "score": 9.9,
        "meets": [
@@ -455,6 +445,16 @@
        "competed": true,
        "name": "Luciana Alvarado-Reid",
        "team": "Central Michigan"
+      },
+      {
+       "id": "deana-sheremeta",
+       "score": 9.875,
+       "meets": [
+        32031
+       ],
+       "competed": true,
+       "name": "Deana Sheremeta",
+       "team": "George Washington"
       }
      ]
     }
@@ -464,30 +464,20 @@
   },
   {
    "login": "DEMO-next-five",
-   "total": 197.2,
+   "total": 197.325,
    "events": {
     "vault": {
-     "total": 48.95,
+     "total": 48.8,
      "slots": [
       {
-       "id": "sage-kellerman",
-       "score": 9.9,
+       "id": "mackenzie-estep",
+       "score": 9.825,
        "meets": [
-        32657
+        31983
        ],
        "competed": true,
-       "name": "Sage Kellerman",
-       "team": "Michigan State"
-      },
-      {
-       "id": "azaraya-ra-akbar",
-       "score": 9.975,
-       "meets": [
-        31979
-       ],
-       "competed": true,
-       "name": "Azaraya Ra-Akbar",
-       "team": "Alabama"
+       "name": "Mackenzie Estep",
+       "team": "Oklahoma"
       },
       {
        "id": "avery-neff",
@@ -518,50 +508,40 @@
        "competed": true,
        "name": "Selena Harris-Miranda",
        "team": "Florida"
+      },
+      {
+       "id": "amari-drayton",
+       "score": 9.9,
+       "meets": [
+        31994
+       ],
+       "competed": true,
+       "name": "Amari Drayton",
+       "team": "LSU"
       }
      ]
     },
     "bars": {
-     "total": 49.65,
+     "total": 49.825,
      "slots": [
       {
-       "id": "selena-harris-miranda",
-       "score": 9.9,
+       "id": "azaraya-ra-akbar",
+       "score": 9.95,
+       "meets": [
+        31979
+       ],
+       "competed": true,
+       "name": "Azaraya Ra-Akbar",
+       "team": "Alabama"
+      },
+      {
+       "id": "riley-mccusker",
+       "score": 9.975,
        "meets": [
         31983
        ],
        "competed": true,
-       "name": "Selena Harris-Miranda",
-       "team": "Florida"
-      },
-      {
-       "id": "tonya-paulsson",
-       "score": 9.875,
-       "meets": [
-        32024
-       ],
-       "competed": true,
-       "name": "Tonya Paulsson",
-       "team": "California"
-      },
-      {
-       "id": "chloe-cho",
-       "score": 9.95,
-       "meets": [
-        32044
-       ],
-       "competed": true,
-       "name": "Chloe Cho",
-       "team": "Illinois"
-      },
-      {
-       "id": "kayla-dicello",
-       "score": 9.95,
-       "meets": [
-        31983
-       ],
-       "competed": true,
-       "name": "Kayla DiCello",
+       "name": "Riley McCusker",
        "team": "Florida"
       },
       {
@@ -573,21 +553,41 @@
        "competed": true,
        "name": "Konnor McClain",
        "team": "LSU"
+      },
+      {
+       "id": "maggie-slife",
+       "score": 9.925,
+       "meets": [
+        32024
+       ],
+       "competed": true,
+       "name": "Maggie Slife",
+       "team": "Air Force"
+      },
+      {
+       "id": "avery-neff",
+       "score": 10,
+       "meets": [
+        31989
+       ],
+       "competed": true,
+       "name": "Avery Neff",
+       "team": "Utah"
       }
      ]
     },
     "beam": {
-     "total": 48.925,
+     "total": 48.975,
      "slots": [
       {
-       "id": "joscelyn-roberson",
-       "score": 9.85,
+       "id": "ciena-alipio",
+       "score": 9.9,
        "meets": [
-        31979
+        32012
        ],
        "competed": true,
-       "name": "Joscelyn Roberson",
-       "team": "Arkansas"
+       "name": "Ciena Alipio",
+       "team": "UCLA"
       },
       {
        "id": "kayla-dicello",
@@ -632,8 +632,18 @@
      ]
     },
     "floor": {
-     "total": 49.675,
+     "total": 49.725,
      "slots": [
+      {
+       "id": "lily-smith",
+       "score": 9.975,
+       "meets": [
+        32024
+       ],
+       "competed": true,
+       "name": "Lily Smith",
+       "team": "Georgia"
+      },
       {
        "id": "kailin-chio",
        "score": 10,
@@ -643,16 +653,6 @@
        "competed": true,
        "name": "Kailin Chio",
        "team": "LSU"
-      },
-      {
-       "id": "nikki-smith",
-       "score": 9.925,
-       "meets": [
-        32657
-       ],
-       "competed": true,
-       "name": "Nikki Smith",
-       "team": "Michigan State"
       },
       {
        "id": "brie-clark",
@@ -693,7 +693,7 @@
   },
   {
    "login": "DEMO-ceiling",
-   "total": 196.5,
+   "total": 196.4,
    "events": {
     "vault": {
      "total": 49.275,
@@ -863,7 +863,7 @@
      ]
     },
     "floor": {
-     "total": 49.525,
+     "total": 49.425,
      "slots": [
       {
        "id": "skye-blakely",
@@ -886,16 +886,6 @@
        "team": "Georgia"
       },
       {
-       "id": "selena-harris-miranda",
-       "score": 9.975,
-       "meets": [
-        31983
-       ],
-       "competed": true,
-       "name": "Selena Harris-Miranda",
-       "team": "Florida"
-      },
-      {
        "id": "arianna-ostrum",
        "score": 9.825,
        "meets": [
@@ -914,6 +904,16 @@
        "competed": true,
        "name": "Kylie Coen",
        "team": "LSU"
+      },
+      {
+       "id": "joscelyn-roberson",
+       "score": 9.875,
+       "meets": [
+        31979
+       ],
+       "competed": true,
+       "name": "Joscelyn Roberson",
+       "team": "Arkansas"
       }
      ]
     }
@@ -926,7 +926,7 @@
    "total": 158.95,
    "events": {
     "vault": {
-     "total": 39.625,
+     "total": 39.7,
      "slots": [
       {
        "id": "kailin-chio",
@@ -959,14 +959,14 @@
        "team": "UCLA"
       },
       {
-       "id": "mackenzie-estep",
-       "score": 9.825,
+       "id": "sage-kellerman",
+       "score": 9.9,
        "meets": [
-        31983
+        32657
        ],
        "competed": true,
-       "name": "Mackenzie Estep",
-       "team": "Oklahoma"
+       "name": "Sage Kellerman",
+       "team": "Michigan State"
       },
       {
        "id": "jamilia-duffus",
@@ -979,7 +979,7 @@
      ]
     },
     "bars": {
-     "total": 39.75,
+     "total": 39.675,
      "slots": [
       {
        "id": "chloe-lacoursiere",
@@ -989,16 +989,6 @@
        ],
        "competed": true,
        "name": "Chloe LaCoursiere",
-       "team": "Alabama"
-      },
-      {
-       "id": "azaraya-ra-akbar",
-       "score": 9.95,
-       "meets": [
-        31979
-       ],
-       "competed": true,
-       "name": "Azaraya Ra-Akbar",
        "team": "Alabama"
       },
       {
@@ -1020,6 +1010,16 @@
        "competed": true,
        "name": "Jordan Chiles",
        "team": "UCLA"
+      },
+      {
+       "id": "tonya-paulsson",
+       "score": 9.875,
+       "meets": [
+        32024
+       ],
+       "competed": true,
+       "name": "Tonya Paulsson",
+       "team": "California"
       },
       {
        "id": "jamilia-duffus",
@@ -1118,14 +1118,14 @@
        "team": "LSU"
       },
       {
-       "id": "lily-smith",
+       "id": "gabby-gladieux",
        "score": 9.975,
        "meets": [
-        32024
+        31979
        ],
        "competed": true,
-       "name": "Lily Smith",
-       "team": "Georgia"
+       "name": "Gabby Gladieux",
+       "team": "Alabama"
       },
       {
        "id": "ariana-desouza",
@@ -1144,5 +1144,5 @@
  ],
  "demo": true,
  "label": "Feb 13–19, 2026",
- "generated_at": "2026-11-02T13:57:56.369Z"
+ "generated_at": "2026-11-02T22:06:30.856Z"
 }

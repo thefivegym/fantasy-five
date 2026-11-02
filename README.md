@@ -9,6 +9,9 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 
 - Each week, pick exactly **5 gymnasts per event** (vault, bars, beam, floor) from anywhere in D1. 20 slots.
   A gymnast can fill more than one event, but only once per event.
+- **One gymnast per team per event.** Within vault, bars, beam or floor, the 5 picks must come from 5 different
+  teams (`MAX_PER_TEAM_PER_EVENT = 1` in `scripts/lib/config.mjs`). The same team, or the same gymnast, can
+  appear again on a different event.
 - **Slot score** = her real score on that event that week. Competes more than once: **best score** counts
   (`MULTI_MEET_MODE` in `scripts/lib/config.mjs`; set to `'average'` to use the mean). Doesn't compete: **0**.
 - **Team total** = sum of all 20 slots. No drops.
@@ -25,7 +28,7 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 3. `.github/workflows/lineup.yml` runs on `issues: opened, edited` when the issue has the `lineup` label or a
    title starting `Lineup:`. `scripts/process-lineup.mjs` parses the JSON block and checks:
    the season and week exist and the week is the open one; exactly 5 unique gymnast ids per event; every id is
-   in `data/gymnasts.json`; the issue's `created_at` (or `updated_at` for an edit) is before that week's lock.
+   in `data/gymnasts.json`; no more than `MAX_PER_TEAM_PER_EVENT` picks from one team on an event; the issue's `created_at` (or `updated_at` for an edit) is before that week's lock.
 4. Valid: writes `data/lineups/<season>/<week>/<login>.json` (a later valid submission replaces it), commits,
    comments a dry confirmation, closes the issue, redeploys Pages. Invalid: comments the exact errors and
    closes the issue as "not planned". Nothing is saved.
