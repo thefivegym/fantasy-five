@@ -74,7 +74,7 @@ const FF = (() => {
   const seasonParam = s => (isDemo(s) ? `season=${encodeURIComponent(s.season)}&` : '');
 
   function chrome(active) {
-    const nav = [['index.html', 'Home'], ['roster.html', 'Roster'], ['build.html', 'Build lineup'], ['leaderboard.html', 'Leaderboard']];
+    const nav = [['index.html', 'Home'], ['roster.html', 'Roster'], ['build.html', 'Build lineup'], ['leaderboard.html', 'Leaderboard'], ['signup.html', 'Sign up']];
     const h = document.createElement('header');
     h.className = 'site-header';
     h.innerHTML = `<div class="wrap"><div class="top"><h1><a href="index.html"><span class="brand">The Five That Score</span> <span class="dash">—</span> <span class="sub">Fantasy Five</span></a></h1>

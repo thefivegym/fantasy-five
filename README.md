@@ -29,8 +29,47 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 - Highest weekly total wins the week. The season leaderboard is the sum of weekly totals.
 - Schema 1 (5 per event, 20 slots) is retired; the workflow rejects it with "Old format".
 
+## Sign-up (required) and the encrypted email
+
+A lineup is only accepted from a GitHub login with `data/players/<login>.json`. Otherwise:
+"Sign up first: https://thefivegym.github.io/fantasy-five/signup.html. Then submit the lineup again."
+
+1. `signup.html`: the player enters an email (required, validated) and a weekly-reminder checkbox (default on).
+   The page encrypts `{"v":1,"email":…}` **in the browser** with WebCrypto RSA-OAEP (SHA-256, 3072-bit) using
+   `assets/email-public-key.json`, then opens a pre-filled issue titled `Signup: …` (label `signup`) whose JSON is
+   `{"game":"fantasy-five","type":"signup","schema":1,"reminders":true,"key_id":…,"email_ciphertext":<base64>}`.
+   The plaintext email never goes into the issue, the repo, Action logs or the site.
+2. `.github/workflows/signup.yml` → `scripts/process-signup.mjs` checks the shape (key id matches, ciphertext is
+   exactly 384 bytes, no plain-looking email anywhere in the issue), writes `data/players/<login>.json`, comments a
+   dry confirmation (never the email or ciphertext), closes the issue. Signing up again replaces the email and
+   setting and keeps `joined_at`. `{"type":"reminders","reminders":false}` (the "Turn reminders off" button)
+   changes only the reminder flag.
+3. Actions cannot decrypt anything: the **private key is not in the repo or in GitHub**. It lives only on the
+   organizer's machine (`/home/box/.secrets/fantasy-five/email-private-key`, mode 600). `.gitignore` blocks
+   `*private-key*`, `*.pem`, `*.key`, `.secrets/`. `data/players/` is left out of the Pages deploy.
+4. Organizer only, locally: `node scripts/admin/decrypt-emails.mjs --winner` (season #1 from the leaderboard),
+   `--login=<login>`, or no flag for everyone. Prints `login, email, reminders`. Refuses to run in Actions.
+
+Rotating the key: generate a new pair, replace `assets/email-public-key.json` (new `key_id`); old sign-ups stay
+readable with the old private key, new ones are rejected until the page reloads with the new key.
+
+## Weekly reminder
+
+`.github/workflows/remind.yml` runs Wednesdays at 15:00 and 16:00 UTC; `scripts/remind.mjs` only posts on the run
+that is **10 AM in Chicago** (16:00 UTC in CST, Nov to mid-March; 15:00 UTC in CDT). If a week locks in the next
+7 days it opens one issue, label `reminder`, titled e.g. `Week 3 lineups lock Fri 5 PM CT`, with the lock time,
+the builder link and an @mention of every player with `reminders: true` (50 per post; more go in follow-up
+comments, since GitHub stops notifying after about 50 mentions in one body). It closes last week's reminder.
+No week locking soon (offseason): it does nothing. Same title already open: nothing. Manual run:
+`workflow_dispatch` with `dry_run` (default on: prints the post, mentions nobody); locally
+`node scripts/remind.mjs --dry-run [--now=2027-01-27T16:00:00Z]`.
+
+**Reminders arrive as a GitHub mention. Check your GitHub email notifications are on.** No email server: GitHub
+emails the mention per each player's notification settings.
+
 ## How a lineup gets in (GitHub sign-in, static site)
 
+0. The player has signed up (above).
 1. `build.html` builds the lineup (kept in `localStorage`) and opens a pre-filled
    `github.com/thefivegym/fantasy-five/issues/new?template=lineup.md&title=Lineup:…&body=…` link.
 2. The player submits the issue while signed in to GitHub. Their **GitHub login is their username**.
@@ -69,6 +108,7 @@ and run `node scripts/score.mjs`.
 | `data/teams.json` | D1 teams: `id`, `name`, `rtn_tid`, `conference`, `roster_url`, `roster_source` (parser), `roster_status` (`official-2026-27` or `provisional-rtn-2026`), `roster_count`, `note`. |
 | `data/season.json` | `season` (2027), `roster`, `week_rule`, `scoring`, `weeks:[{week,label,start,end,lock,status}]`, and a `demo` pointer. |
 | `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],bars,beam,floor,aa:[{score,meet_id,date}]}}, unmatched:[…]}`. `aa` has one entry per meet: `{score, meet_id, date, events}`, the sum of every event she did in that meet. The scorer always re-derives it from the event scores (stored `aa` is used only if a gymnast has no event scores). |
+| `data/players/<login>.json` | `{login, joined_at, updated_at, reminders, key_id, email_ciphertext, issue}`. `email_ciphertext` = base64 RSA-OAEP-256 of `{"v":1,"email":…}`; only the organizer's private key opens it. Not deployed to Pages. |
 | `data/lineups/<season>/<week>/<login>.json` | `{schema: 2, login, season, week, submitted_at, issue, issue_url, lineup:{vault:id, bars:id, beam:id, floor:id, aa:id}}`. A file with `"test": true`, or any schema other than 2, is ignored by scoring. |
 | `data/results/<season>/<week>.json` | `{mode, schema, scores_status, players:[{login,rank,total,slots:{vault:{id,name,team,score,competed,meets},bars,beam,floor,aa:{…,events}}}]}` |
 | `data/leaderboard/<season>.json` | `{weeks, players:[{login,rank,total,weeks_played,best_week,weeks:{<n>:{total,rank,of}}}]}` |
@@ -101,14 +141,17 @@ leaderboard, player pages and cards working. To remove it: delete `data/demo/`, 
 ## Files
 
 ```
-index.html roster.html build.html leaderboard.html player.html card.html   site (vanilla JS, no build)
+index.html roster.html build.html leaderboard.html player.html card.html signup.html   site (vanilla JS, no build)
+assets/email-public-key.json                                               public key for in-browser email encryption
 assets/style.css assets/common.js                                          shared style + helpers
 scripts/lib/{config,scoring,io,names}.mjs                                  game constants + scoring engine
-scripts/process-lineup.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
+scripts/process-lineup.mjs  scripts/process-signup.mjs  scripts/remind.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
+scripts/lib/players.mjs                                                     player records
+scripts/admin/decrypt-emails.mjs                                            organizer only, local: decrypt emails
 scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups, schema 2 (2026 RTN rankings + week schedule only)
 scripts/test/scoring.test.mjs                                               node --test scripts/test/*.test.mjs
 scripts/roster/                                                             offline roster builder
-.github/workflows/{lineup,score,deploy}.yml   .github/ISSUE_TEMPLATE/lineup.md
+.github/workflows/{lineup,signup,remind,score,deploy}.yml   .github/ISSUE_TEMPLATE/lineup.md
 ```
 
 ## Local

@@ -8,7 +8,8 @@ import { readFile, appendFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DATA, readJson, writeJson, loadSeason } from './lib/io.mjs';
 import { validateLineup } from './lib/scoring.mjs';
-import { SLOTS, SLOT_LABEL, LINEUP_SCHEMA, LINEUP_TITLE_PREFIX, LINEUP_LABEL } from './lib/config.mjs';
+import { SLOTS, SLOT_LABEL, LINEUP_SCHEMA, LINEUP_TITLE_PREFIX, LINEUP_LABEL, SIGNUP_URL } from './lib/config.mjs';
+import { loadPlayer } from './lib/players.mjs';
 
 const EVENT_PATH = process.env.GITHUB_EVENT_PATH || process.argv[2];
 const COMMENT_FILE = process.env.COMMENT_FILE || 'lineup-comment.md';
@@ -31,11 +32,12 @@ export function isLineupIssue(issue) {
 const fmtCT = iso => new Date(iso).toLocaleString('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' CT';
 
 /** Core decision. Returns { ok, errors[], record?, path?, week? } */
-export async function processSubmission({ issue, action, now }) {
+export async function processSubmission({ issue, action, now, hasPlayer = async login => !!(await loadPlayer(login)) }) {
   const submittedAt = action === 'edited' ? (issue.updated_at || now) : (issue.created_at || now);
   const data = extractJson(issue.body);
   if (!data) return { ok: false, errors: ['No lineup JSON found in the issue body. Build the lineup at https://thefivegym.github.io/fantasy-five/build.html and submit from there.'] };
   const errors = [];
+  if (!(await hasPlayer(issue.user.login))) return { ok: false, errors: [`Sign up first: ${SIGNUP_URL}. Then submit the lineup again.`] };
   let season;
   try { season = await loadSeason(data.season); } catch { return { ok: false, errors: [`Season ${JSON.stringify(data.season)} does not exist.`] }; }
   const week = season.weeks.find(w => Number(w.week) === Number(data.week));

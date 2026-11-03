@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign up — Fantasy Five</title>
+<meta name="description" content="Fantasy Five: five picks a week, one each on Vault, Bars, Beam, Floor and All-Around, from the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta property="og:title" content="Sign up — Fantasy Five">
+<meta property="og:description" content="Five picks: Vault, Bars, Beam, Floor, All-Around. Five teams. Just the read.">
+<meta name="twitter:site" content="@thefivethatscore">
+<meta name="theme-color" content="#14112b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/common.js"></script>
+</head>
+<body>
+<body>
+<main class="wrap">
+  <div id="banner" class="banner" hidden></div>
+  <h2>Sign up</h2>
+  <p class="sub">Once per season, before your first lineup. A lineup from a GitHub login with no sign-up is not accepted. Your GitHub login is your player name.</p>
+  <section class="card">
+    <h3>Email and reminders</h3>
+    <form id="f" novalidate>
+      <label class="field"><span>Email <b>(required)</b>. Used for one thing: reaching the season winner about the prize.</span>
+        <input type="email" id="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label>
+      <label class="check"><input type="checkbox" id="rem" checked> Weekly reminder to fill my lineup (Wednesday 10 AM CT, before the Friday lock)</label>
+      <p class="sub" id="err" role="alert"></p>
+      <button class="btn primary" id="go" type="submit">Encrypt and open GitHub issue</button>
+    </form>
+    <p class="sub">GitHub issues are public, so your email never goes into one in plain text. This page encrypts it in your browser (RSA-OAEP, SHA-256) with the organizer's public key before the issue opens. The issue, the repo and the site only ever hold the scrambled version. Only the organizer's private key, which is not on GitHub, can read it.</p>
+    <p class="sub">Then press <b>Create</b> on GitHub. A bot saves your sign-up, comments, and closes the issue within a minute or two. Signing up again replaces your email and reminder setting.</p>
+    <p class="sub"><b>Reminders arrive as a GitHub mention. Check your GitHub email notifications are on</b> (GitHub → Settings → Notifications → Email for participating and @mentions).</p>
+  </section>
+  <section class="card">
+    <h3>Reminders only</h3>
+    <p class="sub">Already signed up? Change reminders without re-entering your email.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" id="off" href="#">Turn reminders off</a><a class="btn" id="on" href="#">Turn reminders on</a></div>
+  </section>
+</main>
+<script>
+(async () => {
+  FF.chrome('signup.html');
+  const $ = id => document.getElementById(id);
+  const issueUrl = (title, intro, payload) => `https://github.com/${FF.REPO}/issues/new?labels=signup&title=${encodeURIComponent(title)}&body=${encodeURIComponent(`<!-- ${intro} Press "Create". Don't edit the JSON block. -->\n${intro}\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n`)}`;
+  for (const [id, on] of [['off', false], ['on', true]])
+    $(id).href = issueUrl(`Signup: reminders ${on ? 'on' : 'off'}`, `Fantasy Five: reminders ${on ? 'on' : 'off'}.`, { game: 'fantasy-five', type: 'reminders', schema: 1, reminders: on });
+  const KEY = await FF.json('assets/email-public-key.json');
+  const pub = await crypto.subtle.importKey('jwk', KEY.jwk, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
+  const valid = e => e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+  const b64 = buf => { let s = ''; new Uint8Array(buf).forEach(b => (s += String.fromCharCode(b))); return btoa(s); };
+  /** Exposed for the test harness: returns the issue URL for an email + reminder choice. */
+  window.ffSignupUrl = async (email, reminders) => {
+    const ct = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, new TextEncoder().encode(JSON.stringify({ v: 1, email })));
+    return issueUrl('Signup: Fantasy Five player', `Fantasy Five sign-up. Reminders ${reminders ? 'on' : 'off'}. Email encrypted.`,
+      { game: 'fantasy-five', type: 'signup', schema: 1, reminders, key_id: KEY.key_id, email_ciphertext: b64(ct) });
+  };
+  $('f').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = $('email').value.trim();
+    if (!valid(email)) { $('err').textContent = 'That is not an email address. One is required.'; $('email').focus(); return; }
+    $('err').textContent = '';
+    const url = await window.ffSignupUrl(email, $('rem').checked);
+    $('email').value = '';
+    location.href = url;
+  });
+})().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load: ' + e.message; });
+</script>
+</body>
+</html>

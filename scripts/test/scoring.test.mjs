@@ -104,7 +104,7 @@ test('lineup processor: exact errors against the real roster', async () => {
   const teams = Object.keys(byTeam).filter(t => byTeam[t].length >= 2).slice(0, 6);
   const good = Object.fromEntries(SLOTS.map((s, i) => [s, byTeam[teams[i]][0]]));
   const ts = new Date(new Date(open.lock).getTime() - 864e5).toISOString();
-  const submit = (lineup, schema = 2) => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema, season: season.season, week: open.week, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts });
+  const submit = (lineup, schema = 2) => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema, season: season.season, week: open.week, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: ts }, action: 'opened', now: ts, hasPlayer: async () => true });
   const ok = await submit(good);
   assert.deepEqual(ok.errors, []);
   assert.equal(ok.record.schema, 2);
@@ -183,7 +183,7 @@ test('submissions only for the open week', async () => {
   const lineup = Object.fromEntries(SLOTS.map((s, i) => [s, byTeam[Object.keys(byTeam)[i]][0]]));
   const [w1, w2, w3] = season.weeks;
   const at = new Date(new Date(w2.lock).getTime() - 864e5).toISOString();   // week 2 is open
-  const submit = wk => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema: 2, season: season.season, week: wk, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: at }, action: 'opened', now: at });
+  const submit = wk => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema: 2, season: season.season, week: wk, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: at }, action: 'opened', now: at, hasPlayer: async () => true });
   assert.deepEqual((await submit(w2.week)).errors, []);
   assert.match((await submit(w1.week)).errors[0], new RegExp(`^Week ${w1.week} locked at `));
   assert.match((await submit(w3.week)).errors[0], new RegExp(`^Week ${w3.week} is not open yet. The open week is ${w2.week} `));

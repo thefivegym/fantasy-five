@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: node --test scripts/test/*.test.mjs
-      - run: mkdir -p _site && mkdir -p _site/scripts && cp -r scripts/lib _site/scripts/ && cp -r index.html roster.html build.html leaderboard.html player.html card.html assets data _site/ && touch _site/.nojekyll
+      - run: mkdir -p _site && mkdir -p _site/scripts && cp -r scripts/lib _site/scripts/ && cp -r index.html roster.html build.html leaderboard.html player.html card.html signup.html assets data _site/ && rm -rf _site/data/players && touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }

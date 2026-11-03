@@ -1,0 +1,44 @@
+name: Player sign-up
+on:
+  issues:
+    types: [opened, edited]
+permissions:
+  contents: write
+  issues: write
+concurrency: { group: players, cancel-in-progress: false }
+jobs:
+  signup:
+    if: contains(github.event.issue.labels.*.name, 'signup') || startsWith(github.event.issue.title, 'Signup:')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # The email is already encrypted in the browser. Nothing here can decrypt it, and the script never logs the body.
+      - id: p
+        run: node scripts/process-signup.mjs
+      - name: Commit player record
+        if: steps.p.outputs.accepted == 'true'
+        env:
+          PLAYER_PATH: ${{ steps.p.outputs.path }}
+          ISSUE: ${{ github.event.issue.number }}
+          LOGIN: ${{ github.event.issue.user.login }}
+        run: |
+          git config user.name "fantasy-five-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$PLAYER_PATH"
+          if git diff --cached --quiet; then echo "No change"; exit 0; fi
+          git commit -m "Player: $LOGIN (#$ISSUE)"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
+      - name: Comment and close
+        if: always() && steps.p.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+          ACCEPTED: ${{ steps.p.outputs.accepted }}
+        run: |
+          gh issue edit "$ISSUE" --add-label signup || true
+          gh issue comment "$ISSUE" --body-file signup-comment.md
+          if [ "$ACCEPTED" = "true" ]; then gh issue close "$ISSUE" --reason completed; else gh issue close "$ISSUE" --reason "not planned"; fi

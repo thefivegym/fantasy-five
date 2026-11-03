@@ -3,3 +3,11 @@ _site/
 node_modules/
 __pycache__/
 *.pyc
+
+# never commit private keys or secrets
+*.pem
+*.key
+*private-key*
+.secrets/
+signup-comment.md
+reminder-*.md

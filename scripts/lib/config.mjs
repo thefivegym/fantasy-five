@@ -32,3 +32,16 @@ export const DEFAULT_LOCK = { weekday: 'Friday', time: '17:00', tz: 'America/Chi
 export const REPO = 'thefivegym/fantasy-five';
 export const LINEUP_TITLE_PREFIX = 'Lineup:';
 export const LINEUP_LABEL = 'lineup';
+
+// Players. A lineup is only accepted from a login with data/players/<login>.json (see signup.html).
+export const SIGNUP_LABEL = 'signup';
+export const SIGNUP_TITLE_PREFIX = 'Signup:';
+export const SITE = 'https://thefivegym.github.io/fantasy-five';
+export const SIGNUP_URL = `${SITE}/signup.html`;
+// Email is encrypted in the browser with assets/email-public-key.json (RSA-OAEP, SHA-256, 3072-bit).
+export const EMAIL_CIPHERTEXT_BYTES = 384;
+
+// Weekly reminder issue: Wednesday 10:00 AM America/Chicago before the Friday lock.
+export const REMINDER_LABEL = 'reminder';
+export const REMINDER_LOCAL = { weekday: 'Wednesday', hour: 10, tz: 'America/Chicago' };
+export const MENTIONS_PER_COMMENT = 50;   // GitHub only notifies the first ~50 @mentions in one body
