@@ -78,6 +78,8 @@ async function main() {
   const ev = JSON.parse(await readFile(EVENT_PATH, 'utf8'));
   const issue = ev.issue;
   const out = async (k, v) => process.env.GITHUB_OUTPUT && appendFile(process.env.GITHUB_OUTPUT, `${k}=${v}\n`);
+  // Title or label edits (and the bot's own label change) are not a new submission. Only a body edit counts.
+  if (ev.action === 'edited' && !ev.changes?.body) { console.log('Edit without a body change; skipping.'); await out('skip', 'true'); return; }
   if (!issue || !isLineupIssue(issue)) { console.log('Not a lineup issue; skipping.'); await out('skip', 'true'); return; }
   const res = await processSubmission({ issue, action: ev.action, now: new Date().toISOString() });
   if (res.ok) { await writeJson(join(DATA, '..', res.path), res.record); console.log(`Saved ${res.path}`); }
