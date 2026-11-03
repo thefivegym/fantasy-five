@@ -74,7 +74,7 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
   <li><span><b>Locks Friday 5 PM CT.</b></span></li>
   <li><span><b>Highest season total wins.</b></span></li>
 </ul></template>
-<template id="prize"><div class="prize"><div class="lab">SEASON PRIZE</div><div class="big">Season winner gets a new leo.<br>Your size, your pick.</div><span class="tbd">Leo: TBD</span></div></template>
+<template id="prize"><div class="prize"><div class="lab">SEASON PRIZE</div><div class="big">Season winner gets a new leo.<br>Your size.</div><span class="tbd">Leo: TBD</span></div></template>
 <template id="foot"><div class="foot"><div><div class="url">thefivegym.github.io/fantasy-five</div><div class="hand">@thefivethatscore</div></div><div class="tag">Just the read.</div></div></template>
 <div id="root"></div>
 <script>
@@ -85,7 +85,7 @@ const head = `${T('kick')}<h1>FANTASY FIVE</h1><div class="lede">5 picks a week.
 c.innerHTML = f === 'x'
   ? `<div class="cols"><div>${head}${T('slots')}</div><div class="right">${T('rules')}${T('prize')}</div></div>${T('foot')}`
   : `${head}${T('slots')}${T('rules')}${T('prize')}${T('foot')}`;
-if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Season winner<br>gets a new leo.<br>Your size, your pick.';
+if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Season winner<br>gets a new leo.<br>Your size.';
 document.getElementById('root').append(c);
 // overflow report for the checker
 const r = c.getBoundingClientRect(), bad = [];
