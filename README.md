@@ -19,6 +19,10 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 - Competes more than once: **best** single event score, or best AA meet sum, counts (`MULTI_MEET_MODE`; set to
   `'average'` for the mean). Doesn't compete that slot: **0**.
 - **Team total** = the 5 scores added up (4 event scores + 1 AA; about 80 with an all-arounder in the AA slot, less with a specialist).
+- **New lineup every week. Nothing carries over; no lineup, no score.** Scoring reads only
+  `data/lineups/<season>/<week>/`; a player with no file for a week has no entry that week and adds nothing to
+  the season total. The builder starts empty each week (in-progress picks for the open week are kept in
+  localStorage, other weeks' are cleared). Submissions are accepted only for the open week.
 - A week runs **Friday through Thursday** (America/Chicago dates). Lineups **lock** at the week's `lock`
   timestamp in `data/season.json` (default Friday 5:00 PM CT, before the first meet). Every D1 meet dated in
   the window counts.

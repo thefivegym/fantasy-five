@@ -161,3 +161,30 @@ test('roster AA projection = sum of her 2026 event NQS (avg where no NQS), never
     assert.ok(n > 600, `${f}: only ${n} AA projections`);
   }
 });
+
+test('new lineup every week: nothing carries over, no lineup = no entry', async () => {
+  const { loadLineups } = await import('../score.mjs');
+  assert.equal(Object.keys(await loadLineups('demo', 1)).length, 5);
+  assert.deepEqual(await loadLineups('demo', 2), {});          // DEMO week 1 lineups never count for week 2
+  // x plays weeks 1 and 2, y only week 1: y has no week-2 entry and her season total is week 1 alone.
+  const w1 = weekResults({ season: 't', week: 1, weekScores: week, lineups: { x: { schema: 2, lineup: L }, y: { schema: 2, lineup: L } } });
+  const w2 = weekResults({ season: 't', week: 2, weekScores: week, lineups: { x: { schema: 2, lineup: L } } });
+  assert.deepEqual(w2.players.map(p => p.login), ['x']);
+  const lb = seasonLeaderboard('t', [w1, w2]);
+  const y = lb.players.find(p => p.login === 'y'), x = lb.players.find(p => p.login === 'x');
+  assert.equal(y.total, 78.95); assert.equal(y.weeks_played, 1); assert.deepEqual(Object.keys(y.weeks), ['1']);
+  assert.equal(x.total, 157.9);
+});
+
+test('submissions only for the open week', async () => {
+  const gym = JSON.parse(readFileSync(new URL('../../data/gymnasts.json', import.meta.url))).gymnasts;
+  const season = JSON.parse(readFileSync(new URL('../../data/season.json', import.meta.url)));
+  const byTeam = {}; for (const g of gym) (byTeam[g.team] ||= []).push(g.id);
+  const lineup = Object.fromEntries(SLOTS.map((s, i) => [s, byTeam[Object.keys(byTeam)[i]][0]]));
+  const [w1, w2, w3] = season.weeks;
+  const at = new Date(new Date(w2.lock).getTime() - 864e5).toISOString();   // week 2 is open
+  const submit = wk => processSubmission({ issue: { body: '```json\n' + JSON.stringify({ schema: 2, season: season.season, week: wk, lineup }) + '\n```', user: { login: 't' }, number: 1, created_at: at }, action: 'opened', now: at });
+  assert.deepEqual((await submit(w2.week)).errors, []);
+  assert.match((await submit(w1.week)).errors[0], new RegExp(`^Week ${w1.week} locked at `));
+  assert.match((await submit(w3.week)).errors[0], new RegExp(`^Week ${w3.week} is not open yet. The open week is ${w2.week} `));
+});

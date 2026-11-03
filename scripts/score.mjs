@@ -18,6 +18,7 @@ export async function loadLineups(season, week) {
   for (const f of files) {
     const lf = await readJson(join(dir, f));
     if (lf.test) continue;               // test submissions are kept out of results
+    if (lf.week != null && String(lf.week) !== String(week)) continue;   // a lineup only ever counts for its own week
     out[lf.login] = lf;
   }
   return out;

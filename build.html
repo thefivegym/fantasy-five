@@ -18,7 +18,7 @@
   <div id="banner" class="banner" hidden></div>
   <h2 id="title">Build lineup</h2>
   <p class="sub" id="wkline"></p>
-  <p class="sub"><b>Five picks.</b> One each on Vault, Bars, Beam and Floor (her score on that event), plus one All-Around: any gymnast. Her score is every event she competes that meet, added up. Five different teams. A gymnast fills one slot.</p>
+  <p class="sub"><b>Five picks.</b> One each on Vault, Bars, Beam and Floor (her score on that event), plus one All-Around: any gymnast. Her score is every event she competes that meet, added up. Five different teams. A gymnast fills one slot. New lineup every week. Nothing carries over; no lineup, no score.</p>
   <div class="card" style="padding:10px" id="board"></div>
   <div class="card" style="margin-top:12px">
     <h3>Submit</h3>
@@ -57,7 +57,7 @@ FF.chrome('build.html');
   const w = FF.openWeek(s);
   if (!w) $('wkline').textContent = 'No week is open for lineups right now.';
   else {
-    $('title').textContent = `Build lineup · ${w.label || 'Week ' + w.week} · ${s.season}`;
+    $('title').textContent = `${w.label || 'Week ' + w.week} lineup · ${s.season}`;
     const tick = () => { $('wkline').textContent = `${FF.fmtDate(w.start)} – ${FF.fmtDate(w.end)}. Locks ${FF.fmtCT(w.lock)} (${FF.countdown(new Date(w.lock) - Date.now())}).`; };
     tick(); setInterval(tick, 1000);
   }
@@ -65,7 +65,8 @@ FF.chrome('build.html');
   const KEY = PREFIX + (w ? w.week : 'none');
   let L = null;
   try { L = JSON.parse(localStorage.getItem(KEY)); } catch {}
-  if (!L) { try { const last = Object.keys(localStorage).filter(k => k.startsWith(PREFIX)).sort().pop(); L = last ? JSON.parse(localStorage.getItem(last)) : null; } catch {} }
+  // New lineup every week: never pre-fill from another week. Drop saved picks for other weeks of this season.
+  try { Object.keys(localStorage).filter(k => k.startsWith(PREFIX) && k !== KEY).forEach(k => localStorage.removeItem(k)); } catch {}
   L = Object.fromEntries(SLOTS.map(k => [k, L && typeof L[k] === 'string' && G._byId[L[k]] ? L[k] : null]));
   const save = () => localStorage.setItem(KEY, JSON.stringify(L));
   const teamOf = id => G._byId[id]?.team;
