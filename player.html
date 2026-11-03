@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Player — Fantasy Five</title>
-<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta name="description" content="Fantasy Five: five picks a week, one each on Vault, Bars, Beam, Floor and All-Around, from the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
 <meta property="og:title" content="Player — Fantasy Five">
-<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta property="og:description" content="Five picks: Vault, Bars, Beam, Floor, All-Around. Five teams. Just the read.">
 <meta name="twitter:site" content="@thefivethatscore">
 <meta name="theme-color" content="#14112b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
@@ -44,7 +44,7 @@ FF.chrome('');
   }
   const cell = sl => sl.competed ? FF.f3(sl.score) : '<span class="pill zero">DNC 0</span>';
   $('weeks').innerHTML = `<div class="card tscroll"><h3>Weekly history</h3><table class="t"><thead><tr><th>Week</th>${FF.SLOTS.map(e => `<th class="n">${FF.EV_SHORT[e]}</th>`).join('')}<th class="n">Total</th><th class="n">Rank</th><th></th></tr></thead><tbody>${rows.map(r => `<tr><td>${FF.esc(r.w?.label || 'Week ' + r.wk)}</td>${FF.SLOTS.map(e => `<td class="n">${cell(r.p.slots[e])}</td>`).join('')}<td class="n"><b>${FF.fTot(r.p.total)}</b></td><td class="n">${r.p.rank}/${r.wr.players.length}</td><td><a class="btn small" href="${FF.cardUrl(me.login, r.wk, s)}">Card</a></td></tr>`).join('')}</tbody></table></div>`
-    + rows.slice().reverse().map(r => `<div class="card"><h3>${FF.esc(r.w?.label || 'Week ' + r.wk)} · ${FF.fTot(r.p.total)}</h3><table class="t">${FF.SLOTS.map(e => { const sl = r.p.slots[e]; return `<tr><td><b>${FF.EV_SHORT[e]}</b></td><td>${FF.esc(sl.name)}<div class="sub">${FF.esc(sl.team || '')}</div></td><td class="n">${cell(sl)}</td></tr>`; }).join('')}</table></div>`).join('');
+    + rows.slice().reverse().map(r => `<div class="card"><h3>${FF.esc(r.w?.label || 'Week ' + r.wk)} · ${FF.fTot(r.p.total)}</h3><table class="t">${FF.SLOTS.map(e => { const sl = r.p.slots[e]; return `<tr><td><b>${FF.EV_SHORT[e]}</b></td><td>${FF.esc(sl.name)}<div class="sub">${FF.esc(sl.team || '')}${e === 'aa' && sl.events?.length ? ' · ' + sl.events.map(x => FF.EV_SHORT[x]).join('+') : ''}</div></td><td class="n">${cell(sl)}</td></tr>`; }).join('')}</table></div>`).join('');
 })().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load data: ' + e.message; });
 </script>
 </body>

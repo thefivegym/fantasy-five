@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Roster — Fantasy Five</title>
-<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta name="description" content="Fantasy Five: five picks a week, one each on Vault, Bars, Beam, Floor and All-Around, from the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
 <meta property="og:title" content="Roster — Fantasy Five">
-<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta property="og:description" content="Five picks: Vault, Bars, Beam, Floor, All-Around. Five teams. Just the read.">
 <meta name="twitter:site" content="@thefivethatscore">
 <meta name="theme-color" content="#14112b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
@@ -17,7 +17,7 @@
 <main class="wrap">
   <div id="banner" class="banner" hidden></div>
   <h2>Roster</h2>
-  <p class="sub">2026–27 D1 rosters. Numbers are 2026 Road to Nationals averages and NQS (final regular-season RQS) per event and all-around (AA). They guide the draft; they don't score anything. <span class="pill new">NEW</span> = no 2026 NCAA record (freshman or newcomer). <span class="pill">no RQS</span> = competed in 2026 but not enough on that event for an RQS. <span class="pill">no AA history</span> = not in the 2026 RTN all-around rankings. None of these get a projection.</p>
+  <p class="sub">2026–27 D1 rosters. Numbers are 2026 Road to Nationals averages and NQS (final regular-season RQS) per event. AA = sum of her 2026 event NQS (season average where an event has no NQS) over the events she did in 2026, e.g. UB+BB 19.810. It's a derived number, not an RTN AA score; RTN's own AA NQS is shown next to it where one exists. They guide the draft; they don't score anything. <span class="pill new">NEW</span> = no 2026 NCAA record (freshman or newcomer). <span class="pill">no RQS</span> = competed in 2026 but not enough on that event for an RQS. <span class="pill">no 2026 scores</span> = on a 2026 roster, never competed. None of these get a projection.</p>
   <div class="controls">
     <input type="search" id="q" placeholder="Search name or team" aria-label="Search">
     <select id="team" aria-label="Team"><option value="">All teams</option></select>
@@ -50,7 +50,7 @@ FF.chrome('roster.html');
   $('cov').textContent = `Coverage: ${c.teams_with_roster} of ${c.teams_total} D1 teams, ${G.gymnasts.length} gymnasts, ${c.with_projection} with a 2026 projection on at least one event. Sources in the repo README.`;
   const val = (g, ev, kind) => {
     const evs = ev ? [ev] : FF.EVENTS;   // 'All events' sorts by best apparatus number, not AA
-    const xs = evs.map(e => kind === 'avg' ? g.proj?.[e]?.avg : FF.proj(g, e)).filter(x => x != null);
+    const xs = evs.map(e => kind === 'avg' && e !== 'aa' ? g.proj?.[e]?.avg : FF.proj(g, e)).filter(x => x != null);
     if (!xs.length) return null;
     return ev ? xs[0] : Math.max(...xs);
   };
@@ -63,9 +63,12 @@ FF.chrome('roster.html');
     else rows.sort((a, b) => (val(b, ev, sort) ?? -1) - (val(a, ev, sort) ?? -1) || a.name.localeCompare(b.name));
     $('count').textContent = `${rows.length} gymnasts`;
     const evs = ev ? [ev] : FF.SLOTS;
-    document.querySelector('#tbl thead').innerHTML = `<tr><th>Gymnast</th><th>Team</th><th>Yr</th>${evs.map(e => ev ? `<th class="n">${FF.EV_SHORT[e]} avg</th><th class="n">NQS</th><th class="n">High</th>` : `<th class="n" title="2026 NQS, else average">${FF.EV_SHORT[e]}</th>`).join('')}</tr>`;
+    document.querySelector('#tbl thead').innerHTML = `<tr><th>Gymnast</th><th>Team</th><th>Yr</th>${evs.map(e => ev === 'aa' ? `<th class="n" title="Sum of her 2026 event NQS (avg where no NQS)">AA proj</th><th>Events</th><th class="n" title="RTN 2026 all-around NQS">RTN AA NQS</th>` : ev ? `<th class="n">${FF.EV_SHORT[e]} avg</th><th class="n">NQS</th><th class="n">High</th>` : `<th class="n" title="2026 NQS, else average">${FF.EV_SHORT[e]}</th>`).join('')}</tr>`;
     const cell = (g, e) => {
       const p = g.proj?.[e];
+      if (e === 'aa') { const a = g.aa_proj;
+        if (ev) return a ? `<td class="n">${FF.f3(a.score)}</td><td class="sub">${FF.esc(FF.aaLabel(g).split(' ').filter((_, i) => i !== 1).join(' '))}</td><td class="n">${p ? FF.f3(p.nqs) : '<span class="sub">—</span>'}</td>` : `<td class="n" colspan="3">${FF.noProj(g, e)}</td>`;
+        return `<td class="n" title="${FF.esc(FF.aaLabel(g) || '')}">${a ? FF.f3(a.score) : '<span class="sub">—</span>'}</td>`; }
       if (ev) return p ? `<td class="n">${FF.f3(p.avg)}</td><td class="n">${FF.f3(p.nqs)}</td><td class="n">${FF.f3(p.high)}</td>` : `<td class="n" colspan="3">${FF.noProj(g, e)}</td>`;
       return `<td class="n">${p ? FF.f3(p.nqs ?? p.avg) : '<span class="sub">—</span>'}</td>`;
     };

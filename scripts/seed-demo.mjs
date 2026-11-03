@@ -14,9 +14,11 @@ const playing = new Set(scores.meets.flatMap(m => m.teams));
 const teams = (await readJson(join(DATA, 'teams.json'))).teams;
 const conf = Object.fromEntries(teams.map(t => [t.name, t.conference]));
 const POWER = new Set(['SEC', 'Big Ten', 'Big 12', 'ACC']);
-const nqs = (g, s) => g.proj?.[s]?.nqs ?? null;
+// Event slots: 2026 NQS. AA slot: aa_proj (sum of her 2026 event NQS, avg where no NQS, over the events she did).
+const nqs = (g, s) => (s === 'aa' ? g.aa_proj?.score : g.proj?.[s]?.nqs) ?? null;
+const high = (g, s) => s === 'aa' ? (g.aa_proj?.events.every(e => g.proj?.[e]?.high != null) ? g.aa_proj.events.reduce((a, e) => a + g.proj[e].high, 0) : null) : g.proj?.[s]?.high ?? null;
 const pool = (s, filter = () => true) => roster.filter(g => nqs(g, s) != null && filter(g)).sort((a, b) => nqs(b, s) - nqs(a, s) || a.id.localeCompare(b.id));
-// Fill slots in this order (AA first: the scarcest pool), skipping used gymnasts and full teams.
+// Fill slots in this order (AA first: biggest number on the card), skipping used gymnasts and full teams.
 const ORDER = ['aa', 'vault', 'bars', 'beam', 'floor'];
 function build(candidates) {           // candidates(slot) -> ordered list
   const lineup = {}, used = new Set(), teamN = {};
@@ -34,7 +36,7 @@ const strategies = {
   'DEMO-chalk': chalk,
   'DEMO-next-five': build(s => pool(s, g => onSched(g) && !chalkIds.has(g.id))),
   'DEMO-mid-major': build(s => pool(s, g => onSched(g) && !POWER.has(conf[g.team]))),
-  'DEMO-ceiling': build(s => pool(s, onSched).slice(s === 'aa' ? 5 : 20).sort((a, b) => (b.proj[s].high ?? 0) - (a.proj[s].high ?? 0) || nqs(b, s) - nqs(a, s))),
+  'DEMO-ceiling': build(s => pool(s, onSched).slice(20).sort((a, b) => (high(b, s) ?? 0) - (high(a, s) ?? 0) || nqs(b, s) - nqs(a, s))),
   // chalk, but Floor goes to the best floor worker whose team had a bye: shows the DNC = 0 rule
   'DEMO-bye-week': (() => {
     const L = { ...chalk };

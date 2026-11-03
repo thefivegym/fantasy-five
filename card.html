@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Result card — Fantasy Five</title>
-<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta name="description" content="Fantasy Five: five picks a week, one each on Vault, Bars, Beam, Floor and All-Around, from the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
 <meta property="og:title" content="Result card — Fantasy Five">
-<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta property="og:description" content="Five picks: Vault, Bars, Beam, Floor, All-Around. Five teams. Just the read.">
 <meta name="twitter:site" content="@thefivethatscore">
 <meta name="theme-color" content="#14112b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
@@ -59,7 +59,7 @@ FF.chrome('');
     x.strokeStyle = line; x.lineWidth = 2; x.beginPath(); x.roundRect(left, y, right - left, rowH - 16, 18); x.stroke();
     font(900, 34); x.fillStyle = gold; x.fillText(FF.EV_SHORT[k], left + 28, y + 64);
     font(700, 34); x.fillStyle = sl.competed ? ink : mute; x.fillText(fit(sl.name, 560), left + 130, y + 52);
-    font(500, 24); x.fillStyle = mute; x.fillText(fit(sl.team || '', 560), left + 130, y + 84);
+    font(500, 24); x.fillStyle = mute; x.fillText(fit((sl.team || '') + (k === 'aa' && sl.events?.length ? ' · ' + sl.events.map(e => FF.EV_SHORT[e]).join('+') : ''), 560), left + 130, y + 84);
     x.textAlign = 'right'; font(800, 44); x.fillStyle = sl.competed ? ink : '#e5243b';
     x.fillText(sl.competed ? Number(sl.score).toFixed(3) : '0 DNC', right - 28, y + 66); x.textAlign = 'left';
   });

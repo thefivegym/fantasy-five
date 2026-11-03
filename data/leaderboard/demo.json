@@ -6,20 +6,37 @@
  "players": [
   {
    "login": "DEMO-chalk",
-   "total": 79.775,
+   "total": 79.375,
    "weeks_played": 1,
    "best_week": {
     "week": 1,
-    "total": 79.775
+    "total": 79.375
    },
    "weeks": {
     "1": {
-     "total": 79.775,
+     "total": 79.375,
      "rank": 1,
      "of": 5
     }
    },
    "rank": 1
+  },
+  {
+   "login": "DEMO-next-five",
+   "total": 79.3,
+   "weeks_played": 1,
+   "best_week": {
+    "week": 1,
+    "total": 79.3
+   },
+   "weeks": {
+    "1": {
+     "total": 79.3,
+     "rank": 2,
+     "of": 5
+    }
+   },
+   "rank": 2
   },
   {
    "login": "DEMO-mid-major",
@@ -32,23 +49,6 @@
    "weeks": {
     "1": {
      "total": 79.275,
-     "rank": 2,
-     "of": 5
-    }
-   },
-   "rank": 2
-  },
-  {
-   "login": "DEMO-next-five",
-   "total": 79.25,
-   "weeks_played": 1,
-   "best_week": {
-    "week": 1,
-    "total": 79.25
-   },
-   "weeks": {
-    "1": {
-     "total": 79.25,
      "rank": 3,
      "of": 5
     }
@@ -57,15 +57,15 @@
   },
   {
    "login": "DEMO-ceiling",
-   "total": 78.875,
+   "total": 78.075,
    "weeks_played": 1,
    "best_week": {
     "week": 1,
-    "total": 78.875
+    "total": 78.075
    },
    "weeks": {
     "1": {
-     "total": 78.875,
+     "total": 78.075,
      "rank": 4,
      "of": 5
     }
@@ -74,15 +74,15 @@
   },
   {
    "login": "DEMO-bye-week",
-   "total": 69.775,
+   "total": 69.5,
    "weeks_played": 1,
    "best_week": {
     "week": 1,
-    "total": 69.775
+    "total": 69.5
    },
    "weeks": {
     "1": {
-     "total": 69.775,
+     "total": 69.5,
      "rank": 5,
      "of": 5
     }
@@ -91,5 +91,5 @@
   }
  ],
  "demo": true,
- "generated_at": "2026-11-02T22:29:53.349Z"
+ "generated_at": "2026-11-03T04:24:40.953Z"
 }

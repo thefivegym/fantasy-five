@@ -4,6 +4,7 @@
 Inputs (cache dir, default /workspace/ff-cache):
   rtn/dash_2026_<tid>.json   RTN team dashboard (2026 roster with RTN gymnast ids + class year)
   rtn/ind_2026_12_<ev>.json  RTN individual event rankings, final regular-season week 12 (ave, RQS=NQS, high)
+  rtn/avg/avg_2026_<tid>.json RTN 2026 season averages per gymnast (/api/women/rostermain/2026/<tid>/3)
   sites/<tid>.html           official 2026-27 roster page for each team (see roster_sites.tsv)
   d1-teams.json              RTN D1 team list
 Outputs: data/gymnasts.json, data/teams.json, data/demo/gymnasts-2026.json
@@ -55,6 +56,28 @@ for i, ev in enumerate(PROJ_KEYS, 1):
         f = lambda k: float(r[k]) if r.get(k) not in (None, '') else None
         proj[str(r['gid'])][ev] = {'avg': f('ave'), 'nqs': f('rqs'), 'high': f('high'), 'rank': r.get('rank')}
         rank_rows[str(r['gid'])] = r
+# RTN 2026 season averages per gymnast (team roster 'averages' tab): rtn/avg/avg_2026_<tid>.json
+AVG_KEYS = {'vault': 'maxv', 'bars': 'maxub', 'beam': 'maxbb', 'floor': 'maxfx'}   # RTN reuses the max* names on this tab
+avg26 = defaultdict(dict)
+for t in teams:
+    p = f"{CACHE}/rtn/avg/avg_2026_{t['tid']}.json"
+    if not os.path.exists(p): continue
+    for r in json.load(open(p)).get('ind', []):
+        for ev, k in AVG_KEYS.items():
+            if r.get(k) is not None: avg26[str(r['gid'])][ev] = round(float(r[k]), 3)
+
+def aa_proj(gid):
+    """AA slot projection: sum over the events she competed in 2026 of her 2026 NQS, else her 2026 average. Derived, labeled."""
+    if gid is None: return None
+    pr, av = proj.get(str(gid), {}), avg26.get(str(gid), {})
+    parts = {}
+    for ev in EVENTS:
+        if pr.get(ev, {}).get('nqs') is not None: parts[ev] = (pr[ev]['nqs'], 'nqs')
+        elif pr.get(ev, {}).get('avg') is not None: parts[ev] = (pr[ev]['avg'], 'avg')
+        elif ev in av: parts[ev] = (av[ev], 'avg')
+    if not parts: return None
+    return {'score': round(sum(v for v, _ in parts.values()), 3), 'events': list(parts),
+            'basis': {ev: b for ev, (_, b) in parts.items()}}
 # 2026 RTN rosters (D1)
 rtn26 = {}  # gid -> person
 for t in teams:
@@ -163,7 +186,8 @@ def gym_record(m):
            'class_year': m.get('class_year'), 'hometown': m.get('hometown'),
            'rtn_ids': [int(p['gid'])] if p else [], 'prev_team': p['team'] if p else None,
            'events': p['events'] if p and p['events'] else None,
-           'proj': {ev: pr[ev] for ev in PROJ_KEYS if pr and ev in pr} or None}
+           'proj': {ev: pr[ev] for ev in PROJ_KEYS if pr and ev in pr} or None,
+           'aa_proj': aa_proj(p['gid']) if p else None}
     rec['projection_status'] = 'ranked' if rec['proj'] else ('unranked-2026' if p else 'none')
     if not p: rec['projection_note'] = 'No 2026 NCAA record found on Road to Nationals (freshman, or newcomer not matched).'
     elif not rec['proj']: rec['projection_note'] = 'On a 2026 RTN roster but not in the final 2026 event rankings (too few scores for an RQS).'
@@ -175,16 +199,20 @@ cov = {'teams_total': len(teams), 'teams_with_roster': sum(1 for t in team_out i
        'teams_official_2026_27': sum(1 for t in team_out if t['roster_status'] == 'official-2026-27'),
        'teams_provisional': [t['name'] for t in team_out if t['roster_status'] != 'official-2026-27'],
        'gymnasts': len(gyms), 'with_projection': sum(1 for g in gyms if g['proj']),
-       'with_aa_projection': sum(1 for g in gyms if g['proj'] and 'aa' in g['proj']),
+       'with_aa_projection': sum(1 for g in gyms if g['aa_proj']),
+       'with_rtn_aa_nqs': sum(1 for g in gyms if g['proj'] and 'aa' in g['proj']),
+       'aa_proj_uses_avg': sum(1 for g in gyms if g['aa_proj'] and 'avg' in g['aa_proj']['basis'].values()),
        'no_ncaa_history': sum(1 for g in gyms if g['projection_status'] == 'none'),
        'unranked_2026': sum(1 for g in gyms if g['projection_status'] == 'unranked-2026'),
        'freshmen_listed': sum(1 for g in gyms if (g['class_year'] or '').endswith('Fr.'))}
 meta = {'generated_at': now, 'season': 2027,
         'sources': {'rosters': 'Official 2026-27 team roster pages (URLs in data/teams.json)',
                     'rtn_ids_and_2026_rosters': 'https://www.roadtonationals.com/api/women/dashboard/2026/<team_id>',
-                    'projections': 'https://www.roadtonationals.com/api/women/results/2026/12/1/<1-4 = VT/UB/BB/FX, 5 = AA> (final 2026 regular-season individual rankings: ave, RQS, high)'},
+                    'projections': 'https://www.roadtonationals.com/api/women/results/2026/12/1/<1-4 = VT/UB/BB/FX, 5 = AA> (final 2026 regular-season individual rankings: ave, RQS, high)',
+                    'season_averages': 'https://www.roadtonationals.com/api/women/rostermain/2026/<team_id>/3 (2026 season averages per gymnast, used where an event has no RQS)'},
         'projection_fields': {'avg': '2026 season average on the event (RTN)', 'nqs': '2026 final regular-season RQS (RTN), used as NQS',
-                              'high': '2026 season high', 'rank': 'RTN national rank among all divisions, week 12'},
+                              'high': '2026 season high', 'rank': 'RTN national rank among all divisions, week 12',
+                              'aa_proj': 'All-Around slot projection, derived: sum of her 2026 NQS (else 2026 season average) on each event she competed in 2026. basis says which per event. Not an RTN AA number; proj.aa is the real RTN AA NQS where one exists.'},
         'coverage': cov}
 os.makedirs(f'{ROOT}/data/demo', exist_ok=True)
 json.dump({**meta, 'gymnasts': gyms}, open(f'{ROOT}/data/gymnasts.json', 'w'), separators=(',', ':'))
@@ -203,7 +231,7 @@ for d in demo:
         i = b if cnt[b] == 1 and b not in used else f"{b}-{slug(d['team'])}-2026"
     pr = proj.get(d['gid'])
     drecs.append({'id': i, 'name': f"{d['first']} {d['last']}", 'team': d['team'], 'team_id': slug(d['team']), 'rtn_ids': [int(d['gid'])],
-                  'proj': {ev: pr[ev] for ev in PROJ_KEYS if pr and ev in pr} or None})
+                  'proj': {ev: pr[ev] for ev in PROJ_KEYS if pr and ev in pr} or None, 'aa_proj': aa_proj(d['gid'])})
 json.dump({'generated_at': now, 'season': 'demo', 'demo': True, 'note': 'DEMO only: 2026 D1 rosters from Road to Nationals.', 'gymnasts': drecs},
           open(f'{ROOT}/data/demo/gymnasts-2026.json', 'w'), separators=(',', ':'))
 print(json.dumps(cov, indent=1))

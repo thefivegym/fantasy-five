@@ -8,14 +8,17 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 ## Rules (lineup schema 2)
 
 - Each week, pick **5 gymnasts**, one per slot, from anywhere in D1:
-  **Vault, Bars, Beam, Floor** (her score on that event) and **All-Around** (her AA total).
-- **AA** only counts from a meet where she competed all four events; the total is the sum of her four scores
-  in that meet. No all-four meet that week: the AA slot scores 0.
+  **Vault, Bars, Beam, Floor** (her score on that event) and **All-Around**.
+- **All-Around: any gymnast. Her score is every event she competes that meet, added up.** One event, two, three
+  or four: a two-event specialist scores her two events added together. No events that week: 0.
+- **AA with two meets in a week:** each meet is summed on its own and the best meet sum counts (`MULTI_MEET_MODE`).
+  Events are never mixed across meets: VT+FX 19.75 at meet 1 and VT 9.95 at meet 2 scores 19.75, not 9.95+9.85.
+  Config: `AA_MIN_EVENTS = 1` (4 restores the old all-four rule), `AA_SCOPE = 'meet'` (`'week'` would mix meets).
 - **Five different teams:** `MAX_PER_TEAM_PER_LINEUP = 1`. **One slot per gymnast:** `MAX_USES_PER_GYMNAST = 1`.
   Both in `scripts/lib/config.mjs`.
-- Competes more than once: **best** single event score, or best AA total, counts (`MULTI_MEET_MODE`; set to
+- Competes more than once: **best** single event score, or best AA meet sum, counts (`MULTI_MEET_MODE`; set to
   `'average'` for the mean). Doesn't compete that slot: **0**.
-- **Team total** = the 5 scores added up (4 event scores + 1 AA, about an 80-point scale).
+- **Team total** = the 5 scores added up (4 event scores + 1 AA; about 80 with an all-arounder in the AA slot, less with a specialist).
 - A week runs **Friday through Thursday** (America/Chicago dates). Lineups **lock** at the week's `lock`
   timestamp in `data/season.json` (default Friday 5:00 PM CT, before the first meet). Every D1 meet dated in
   the window counts.
@@ -58,17 +61,17 @@ and run `node scripts/score.mjs`.
 
 | File | Contents |
 |---|---|
-| `data/gymnasts.json` | `{generated_at, sources, coverage, gymnasts:[…]}`. Gymnast: `id` (stable slug, `first-last`, `-team` on a name clash), `name`, `team`, `team_id`, `class_year`, `hometown`, `rtn_ids` (Road to Nationals gymnast ids), `prev_team` (2026 team), `events` (events she competed in 2026, or null), `proj` (`{vault|bars|beam|floor|aa:{avg,nqs,high,rank}}` from 2026, or null), `projection_status` (`ranked` / `unranked-2026` / `none`), `projection_note`. |
+| `data/gymnasts.json` | `{generated_at, sources, coverage, gymnasts:[…]}`. Gymnast: `id` (stable slug, `first-last`, `-team` on a name clash), `name`, `team`, `team_id`, `class_year`, `hometown`, `rtn_ids` (Road to Nationals gymnast ids), `prev_team` (2026 team), `events` (events she competed in 2026, or null), `proj` (`{vault|bars|beam|floor|aa:{avg,nqs,high,rank}}` from 2026, or null; `aa` = RTN's real AA NQS, only for gymnasts RTN ranks in the AA), `aa_proj` (`{score, events, basis}`: AA slot projection, derived, see below; or null), `projection_status` (`ranked` / `unranked-2026` / `none`), `projection_note`. |
 | `data/teams.json` | D1 teams: `id`, `name`, `rtn_tid`, `conference`, `roster_url`, `roster_source` (parser), `roster_status` (`official-2026-27` or `provisional-rtn-2026`), `roster_count`, `note`. |
 | `data/season.json` | `season` (2027), `roster`, `week_rule`, `scoring`, `weeks:[{week,label,start,end,lock,status}]`, and a `demo` pointer. |
-| `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],bars,beam,floor,aa:[{score,meet_id,date}]}}, unmatched:[…]}`. `aa` has one entry per meet where she has all four event scores (sum of the four); the scorer derives it if absent. |
+| `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],bars,beam,floor,aa:[{score,meet_id,date}]}}, unmatched:[…]}`. `aa` has one entry per meet: `{score, meet_id, date, events}`, the sum of every event she did in that meet. The scorer always re-derives it from the event scores (stored `aa` is used only if a gymnast has no event scores). |
 | `data/lineups/<season>/<week>/<login>.json` | `{schema: 2, login, season, week, submitted_at, issue, issue_url, lineup:{vault:id, bars:id, beam:id, floor:id, aa:id}}`. A file with `"test": true`, or any schema other than 2, is ignored by scoring. |
-| `data/results/<season>/<week>.json` | `{mode, schema, scores_status, players:[{login,rank,total,slots:{vault:{id,name,team,score,competed,meets},bars,beam,floor,aa}}]}` |
+| `data/results/<season>/<week>.json` | `{mode, schema, scores_status, players:[{login,rank,total,slots:{vault:{id,name,team,score,competed,meets},bars,beam,floor,aa:{…,events}}}]}` |
 | `data/leaderboard/<season>.json` | `{weeks, players:[{login,rank,total,weeks_played,best_week,weeks:{<n>:{total,rank,of}}}]}` |
 
 Projections are guidance only: 2026 season average (`avg`), 2026 final regular-season RQS used as NQS
 (`nqs`), and season high, from the RTN individual rankings
-(`/api/women/results/2026/12/1/<event>`, 1–4 = VT/UB/BB/FX, 5 = AA). Gymnasts not in the 2026 AA rankings (fewer than the RQS minimum of AA meets) show "no AA history" on the AA slot and have no `proj.aa`. Gymnasts with no 2026 NCAA record (freshmen, unmatched newcomers) have
+(`/api/women/results/2026/12/1/<event>`, 1–4 = VT/UB/BB/FX, 5 = AA). **AA projection (`aa_proj`)** is derived, not an RTN number: the sum of her 2026 NQS on each event she competed in 2026, falling back to her 2026 season average (`/api/women/rostermain/2026/<team_id>/3`) on an event with no NQS. `events` lists the events it covers and `basis` says nqs or avg per event; the site shows it as e.g. "UB+BB 19.810" or "VT+FX 19.500 (FX avg)", labeled "sum of event NQS", with RTN's own AA NQS beside it where one exists. The AA picker sorts by it. On a 2026 roster with no 2026 scores: "no 2026 scores". Gymnasts with no 2026 NCAA record (freshmen, unmatched newcomers) have
 `proj: null` and show as NEW. Gymnasts who competed in 2026 but not often enough to get an RQS are
 `unranked-2026`, also `proj: null`. Nothing is estimated.
 

@@ -1,5 +1,5 @@
 // Scoring engine. Pure functions, no I/O, no dependencies.
-import { EVENTS, SLOTS, SLOT_LABEL, MULTI_MEET_MODE, MAX_PER_TEAM_PER_LINEUP, MAX_USES_PER_GYMNAST, LINEUP_SCHEMA } from './config.mjs';
+import { EVENTS, SLOTS, SLOT_LABEL, MULTI_MEET_MODE, AA_MIN_EVENTS, AA_SCOPE, MAX_PER_TEAM_PER_LINEUP, MAX_USES_PER_GYMNAST, LINEUP_SCHEMA } from './config.mjs';
 
 const r3 = x => Math.round(x * 1000) / 1000;
 
@@ -12,16 +12,29 @@ export function slotValue(entries, mode = MULTI_MEET_MODE) {
   throw new Error(`Unknown MULTI_MEET_MODE: ${mode}`);
 }
 
-/** AA entries for one gymnast: one per meet where she has all four event scores; total = sum of the four. */
-export function deriveAA(perEvent) {
+/** AA entries for one gymnast, from her per-event scores.
+ *  scope 'meet': one entry per meet with at least minEvents events; score = sum of every event she did in that meet.
+ *  scope 'week': one entry; score = her best score on each event across the week, added up.
+ *  Each entry: {score, meet_id (or meet_ids), date, events:[...]}. */
+export function deriveAA(perEvent, { minEvents = AA_MIN_EVENTS, scope = AA_SCOPE } = {}) {
+  if (scope === 'week') {
+    const ev = EVENTS.filter(e => (perEvent?.[e] || []).some(x => Number.isFinite(Number(x.score))));
+    if (!ev.length || ev.length < minEvents) return [];
+    const best = e => Math.max(...perEvent[e].map(x => Number(x.score)).filter(Number.isFinite));
+    const meet_ids = [...new Set(ev.flatMap(e => perEvent[e].map(x => x.meet_id)))];
+    return [{ score: r3(ev.reduce((a, e) => a + best(e), 0)), meet_ids, events: ev }];
+  }
+  if (scope !== 'meet') throw new Error(`Unknown AA_SCOPE: ${scope}`);
   const byMeet = new Map();
   for (const ev of EVENTS) for (const e of perEvent?.[ev] || []) {
+    const sc = Number(e.score); if (!Number.isFinite(sc)) continue;
     const m = byMeet.get(e.meet_id) || { meet_id: e.meet_id, date: e.date, ev: {} };
-    m.ev[ev] = Math.max(m.ev[ev] ?? -Infinity, Number(e.score));
+    m.ev[ev] = Math.max(m.ev[ev] ?? -Infinity, sc);
     byMeet.set(e.meet_id, m);
   }
-  return [...byMeet.values()].filter(m => EVENTS.every(ev => Number.isFinite(m.ev[ev])))
-    .map(m => ({ score: r3(EVENTS.reduce((a, ev) => a + m.ev[ev], 0)), meet_id: m.meet_id, date: m.date }));
+  return [...byMeet.values()].map(m => ({ m, ev: EVENTS.filter(e => Number.isFinite(m.ev[e])) }))
+    .filter(({ ev }) => ev.length >= Math.max(1, minEvents))
+    .map(({ m, ev }) => ({ score: r3(ev.reduce((a, e) => a + m.ev[e], 0)), meet_id: m.meet_id, date: m.date, events: ev }));
 }
 
 /** Validate a v2 lineup { vault:id, bars:id, beam:id, floor:id, aa:id }. Returns exact error strings.
@@ -54,16 +67,22 @@ export function validateLineup(lineup, gymnastIds, teamOf = null, { maxPerTeam =
   return errs;
 }
 
-/** Score one v2 lineup against a week's scores file. AA uses weekScores.scores[id].aa if present, else derives it. */
+/** Score one v2 lineup against a week's scores file. AA is always derived from her per-event scores (deriveAA);
+ *  a stored scores[id].aa is only used when there are no per-event scores for her. */
 export function scoreLineup(lineup, weekScores, mode = MULTI_MEET_MODE) {
   const per = weekScores?.scores || {};
   const slots = {};
   let total = 0;
   for (const s of SLOTS) {
     const id = lineup[s];
-    const entries = s === 'aa' ? (per[id]?.aa || deriveAA(per[id])) : (per[id]?.[s] || []);
+    const hasEv = EVENTS.some(e => per[id]?.[e]?.length);
+    const entries = s === 'aa' ? (hasEv ? deriveAA(per[id]) : (per[id]?.aa || [])) : (per[id]?.[s] || []);
     const score = slotValue(entries, mode);
-    slots[s] = { id, score, meets: entries.map(e => e.meet_id), competed: entries.length > 0 };
+    slots[s] = { id, score, meets: entries.flatMap(e => e.meet_ids || [e.meet_id]), competed: entries.length > 0 };
+    if (s === 'aa' && entries.length) {   // which events made up the counted AA sum
+      const top = mode === 'best' ? entries.reduce((a, b) => (b.score > a.score ? b : a)) : null;
+      slots[s].events = top ? top.events : [...new Set(entries.flatMap(e => e.events))];
+    }
     total += score;
   }
   return { total: r3(total), slots };

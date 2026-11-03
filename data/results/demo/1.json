@@ -8,17 +8,17 @@
  "players": [
   {
    "login": "DEMO-chalk",
-   "total": 79.775,
+   "total": 79.375,
    "slots": {
     "vault": {
-     "id": "addison-fatta",
-     "score": 10,
+     "id": "kailin-chio",
+     "score": 9.975,
      "meets": [
-      31983
+      31994
      ],
      "competed": true,
-     "name": "Addison Fatta",
-     "team": "Oklahoma"
+     "name": "Kailin Chio",
+     "team": "LSU"
     },
     "bars": {
      "id": "chloe-lacoursiere",
@@ -41,28 +41,98 @@
      "team": "Florida"
     },
     "floor": {
+     "id": "camarah-williams",
+     "score": 9.875,
+     "meets": [
+      32024
+     ],
+     "competed": true,
+     "name": "CaMarah Williams",
+     "team": "Georgia"
+    },
+    "aa": {
      "id": "jordan-chiles",
-     "score": 10,
+     "score": 39.625,
      "meets": [
       32012
      ],
      "competed": true,
+     "events": [
+      "vault",
+      "bars",
+      "beam",
+      "floor"
+     ],
      "name": "Jordan Chiles",
      "team": "UCLA"
-    },
-    "aa": {
-     "id": "kailin-chio",
-     "score": 39.875,
-     "meets": [
-      31994
-     ],
-     "competed": true,
-     "name": "Kailin Chio",
-     "team": "LSU"
     }
    },
    "submitted_at": "2026-02-13T22:00:00Z",
    "rank": 1
+  },
+  {
+   "login": "DEMO-next-five",
+   "total": 79.3,
+   "slots": {
+    "vault": {
+     "id": "sage-kellerman",
+     "score": 9.9,
+     "meets": [
+      32657
+     ],
+     "competed": true,
+     "name": "Sage Kellerman",
+     "team": "Michigan State"
+    },
+    "bars": {
+     "id": "azaraya-ra-akbar",
+     "score": 9.95,
+     "meets": [
+      31979
+     ],
+     "competed": true,
+     "name": "Azaraya Ra-Akbar",
+     "team": "Alabama"
+    },
+    "beam": {
+     "id": "ciena-alipio",
+     "score": 9.9,
+     "meets": [
+      32012
+     ],
+     "competed": true,
+     "name": "Ciena Alipio",
+     "team": "UCLA"
+    },
+    "floor": {
+     "id": "kaliya-lincoln",
+     "score": 9.975,
+     "meets": [
+      31994
+     ],
+     "competed": true,
+     "name": "Kaliya Lincoln",
+     "team": "LSU"
+    },
+    "aa": {
+     "id": "addison-fatta",
+     "score": 39.575,
+     "meets": [
+      31983
+     ],
+     "competed": true,
+     "events": [
+      "vault",
+      "bars",
+      "beam",
+      "floor"
+     ],
+     "name": "Addison Fatta",
+     "team": "Oklahoma"
+    }
+   },
+   "submitted_at": "2026-02-13T22:00:00Z",
+   "rank": 2
   },
   {
    "login": "DEMO-mid-major",
@@ -116,66 +186,14 @@
       32024
      ],
      "competed": true,
+     "events": [
+      "vault",
+      "bars",
+      "beam",
+      "floor"
+     ],
      "name": "Maggie Slife",
      "team": "Air Force"
-    }
-   },
-   "submitted_at": "2026-02-13T22:00:00Z",
-   "rank": 2
-  },
-  {
-   "login": "DEMO-next-five",
-   "total": 79.25,
-   "slots": {
-    "vault": {
-     "id": "mackenzie-estep",
-     "score": 9.825,
-     "meets": [
-      31983
-     ],
-     "competed": true,
-     "name": "Mackenzie Estep",
-     "team": "Oklahoma"
-    },
-    "bars": {
-     "id": "azaraya-ra-akbar",
-     "score": 9.95,
-     "meets": [
-      31979
-     ],
-     "competed": true,
-     "name": "Azaraya Ra-Akbar",
-     "team": "Alabama"
-    },
-    "beam": {
-     "id": "ciena-alipio",
-     "score": 9.9,
-     "meets": [
-      32012
-     ],
-     "competed": true,
-     "name": "Ciena Alipio",
-     "team": "UCLA"
-    },
-    "floor": {
-     "id": "camarah-williams",
-     "score": 9.875,
-     "meets": [
-      32024
-     ],
-     "competed": true,
-     "name": "CaMarah Williams",
-     "team": "Georgia"
-    },
-    "aa": {
-     "id": "avery-neff",
-     "score": 39.7,
-     "meets": [
-      31989
-     ],
-     "competed": true,
-     "name": "Avery Neff",
-     "team": "Utah"
     }
    },
    "submitted_at": "2026-02-13T22:00:00Z",
@@ -183,7 +201,7 @@
   },
   {
    "login": "DEMO-ceiling",
-   "total": 78.875,
+   "total": 78.075,
    "slots": {
     "vault": {
      "id": "hannah-horton",
@@ -207,34 +225,40 @@
      "team": "North Carolina State"
     },
     "beam": {
-     "id": "camarah-williams",
-     "score": 9.875,
-     "meets": [
-      32024
-     ],
-     "competed": true,
-     "name": "CaMarah Williams",
-     "team": "Georgia"
-    },
-    "floor": {
-     "id": "arianna-ostrum",
-     "score": 9.825,
-     "meets": [
-      32006
-     ],
-     "competed": true,
-     "name": "Arianna Ostrum",
-     "team": "Minnesota"
-    },
-    "aa": {
-     "id": "selena-harris-miranda",
-     "score": 39.425,
+     "id": "emjae-frazier",
+     "score": 9.85,
      "meets": [
       31983
      ],
      "competed": true,
-     "name": "Selena Harris-Miranda",
+     "name": "eMjae Frazier",
      "team": "Florida"
+    },
+    "floor": {
+     "id": "nyla-aquino",
+     "score": 9.85,
+     "meets": [
+      32024
+     ],
+     "competed": true,
+     "name": "Nyla Aquino",
+     "team": "Georgia"
+    },
+    "aa": {
+     "id": "arianna-ostrum",
+     "score": 38.625,
+     "meets": [
+      32006
+     ],
+     "competed": true,
+     "events": [
+      "vault",
+      "bars",
+      "beam",
+      "floor"
+     ],
+     "name": "Arianna Ostrum",
+     "team": "Minnesota"
     }
    },
    "submitted_at": "2026-02-13T22:00:00Z",
@@ -242,17 +266,17 @@
   },
   {
    "login": "DEMO-bye-week",
-   "total": 69.775,
+   "total": 69.5,
    "slots": {
     "vault": {
-     "id": "addison-fatta",
-     "score": 10,
+     "id": "kailin-chio",
+     "score": 9.975,
      "meets": [
-      31983
+      31994
      ],
      "competed": true,
-     "name": "Addison Fatta",
-     "team": "Oklahoma"
+     "name": "Kailin Chio",
+     "team": "LSU"
     },
     "bars": {
      "id": "chloe-lacoursiere",
@@ -283,14 +307,20 @@
      "team": "Alaska"
     },
     "aa": {
-     "id": "kailin-chio",
-     "score": 39.875,
+     "id": "jordan-chiles",
+     "score": 39.625,
      "meets": [
-      31994
+      32012
      ],
      "competed": true,
-     "name": "Kailin Chio",
-     "team": "LSU"
+     "events": [
+      "vault",
+      "bars",
+      "beam",
+      "floor"
+     ],
+     "name": "Jordan Chiles",
+     "team": "UCLA"
     }
    },
    "submitted_at": "2026-02-13T22:00:00Z",
@@ -299,5 +329,5 @@
  ],
  "demo": true,
  "label": "Feb 13–19, 2026",
- "generated_at": "2026-11-02T22:29:53.348Z"
+ "generated_at": "2026-11-03T04:24:40.948Z"
 }

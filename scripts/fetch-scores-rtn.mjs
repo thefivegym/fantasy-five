@@ -90,7 +90,7 @@ async function fetchWeek(season, week, ctx) {
       extractScores(r, m, ctx.index, scores, unmatched);
     } catch (e) { console.log('  ', e.message); missing.push(m.meet_id); }
   }
-  // AA: one entry per meet where she has all four event scores (total = sum of the four).
+  // AA: one entry per meet = every event she did in that meet, added up (see deriveAA / AA_MIN_EVENTS, AA_SCOPE).
   for (const g of Object.values(scores)) { const aa = deriveAA(g); if (aa.length) g.aa = aa; }
   const ended = new Date(`${week.end}T23:59:59-06:00`).getTime() < Date.now();
   const out = {

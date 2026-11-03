@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Build lineup — Fantasy Five</title>
-<meta name="description" content="Fantasy Five: pick five gymnasts per event, every week of the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
+<meta name="description" content="Fantasy Five: five picks a week, one each on Vault, Bars, Beam, Floor and All-Around, from the NCAA D1 women's gymnastics season. By The Five That Score. Just the read.">
 <meta property="og:title" content="Build lineup — Fantasy Five">
-<meta property="og:description" content="Pick five per event. Twenty slots. No drops. Just the read.">
+<meta property="og:description" content="Five picks: Vault, Bars, Beam, Floor, All-Around. Five teams. Just the read.">
 <meta name="twitter:site" content="@thefivethatscore">
 <meta name="theme-color" content="#14112b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2314112b'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='700' text-anchor='middle' fill='%23ffcf4a'%3E5%3C/text%3E%3C/svg%3E">
@@ -18,7 +18,7 @@
   <div id="banner" class="banner" hidden></div>
   <h2 id="title">Build lineup</h2>
   <p class="sub" id="wkline"></p>
-  <p class="sub"><b>Five picks.</b> One each on Vault, Bars, Beam and Floor (her score on that event), plus one All-Around (her AA total from a meet where she did all four). Five different teams. A gymnast fills one slot.</p>
+  <p class="sub"><b>Five picks.</b> One each on Vault, Bars, Beam and Floor (her score on that event), plus one All-Around: any gymnast. Her score is every event she competes that meet, added up. Five different teams. A gymnast fills one slot.</p>
   <div class="card" style="padding:10px" id="board"></div>
   <div class="card" style="margin-top:12px">
     <h3>Submit</h3>
@@ -27,7 +27,7 @@
   </div>
 </main>
 <div class="sticky-bar"><div class="wrap">
-  <div><div class="sub">Projected total (2026 NQS; no projection = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/5</span></div></div>
+  <div><div class="sub">Projected total (2026 NQS; AA = sum of her event NQS; no projection = 0)</div><div class="kpi"><span class="big" id="ptotal">0.000</span><span class="sub" id="filled">0/5</span></div></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn small" id="clear">Clear</button>
     <a class="btn primary" id="submit" href="#" aria-disabled="true">Submit with GitHub</a>
@@ -92,7 +92,7 @@ FF.chrome('build.html');
       if (!g) return `<button class="slot" data-k="${k}">${label}<span class="nm muted">+ Pick ${FF.EV_NAME[k]}</span></button>`;
       const p = FF.proj(g, k); tot += p || 0; n++;
       const clash = ut[g.team].length > MAX_TEAM || SLOTS.filter(x => L[x] === id).length > 1;
-      return `<div class="slot filled${clash ? ' clash' : ''}" data-k="${k}" role="button" tabindex="0">${label}<span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? FF.noProj(g, k) : FF.f3(p)}</span><button class="x" data-x="${k}" aria-label="Remove">×</button></div>`;
+      return `<div class="slot filled${clash ? ' clash' : ''}" data-k="${k}" role="button" tabindex="0">${label}<span class="nm">${FF.esc(g.name)}<small>${FF.esc(g.team)}</small></span><span class="pj">${p == null ? FF.noProj(g, k) : (k === 'aa' ? FF.esc(FF.aaLabel(g)) : FF.f3(p))}</span><button class="x" data-x="${k}" aria-label="Remove">×</button></div>`;
     }).join('');
     $('ptotal').textContent = tot.toFixed(3);
     $('filled').textContent = `${n}/5`;
@@ -119,7 +119,7 @@ FF.chrome('build.html');
     if (x) { L[x.dataset.x] = null; save(); render(); e.stopPropagation(); return; }
     const sl = e.target.closest('.slot'); if (!sl) return;
     cur = sl.dataset.k;
-    $('ptitle').textContent = `${FF.EV_NAME[cur]}${cur === 'aa' ? ' · sorted by 2026 AA NQS' : ''}`;
+    $('ptitle').textContent = `${FF.EV_NAME[cur]}${cur === 'aa' ? ' · sorted by sum of her 2026 event NQS' : ''}`;
     $('pq').value = ''; plist(); $('picker').showModal(); $('pq').focus();
   });
   function blockReason(g) {
@@ -135,7 +135,9 @@ FF.chrome('build.html');
     rows.sort((a, b) => (FF.proj(b, k) ?? -1) - (FF.proj(a, k) ?? -1) || a.name.localeCompare(b.name));
     $('plist').innerHTML = rows.slice(0, 200).map(g => {
       const p = g.proj?.[k], why = blockReason(g);
-      return `<button class="row" data-id="${FF.esc(g.id)}" ${why ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}${why ? ' · ' + FF.esc(why) : ''}</span></span><span class="num sub">${p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)} · high ${FF.f3(p.high)}` : FF.noProj(g, k)}</span></button>`;
+      const nums = k === 'aa' ? (g.aa_proj ? `sum of event NQS: ${FF.esc(FF.aaLabel(g))}${p ? ` · RTN AA NQS ${FF.f3(p.nqs)}` : ''}` : FF.noProj(g, k))
+        : p ? `avg ${FF.f3(p.avg)} · NQS ${FF.f3(p.nqs)} · high ${FF.f3(p.high)}` : FF.noProj(g, k);
+      return `<button class="row" data-id="${FF.esc(g.id)}" ${why ? 'disabled' : ''}><span class="nm"><b>${FF.esc(g.name)}</b> <span class="sub">${FF.esc(g.team)}${g.class_year ? ' · ' + FF.esc(g.class_year) : ''}${why ? ' · ' + FF.esc(why) : ''}</span></span><span class="num sub">${nums}</span></button>`;
     }).join('') + (rows.length > 200 ? `<div class="sub" style="padding:10px">${rows.length - 200} more. Search to narrow.</div>` : '');
   }
   $('pq').addEventListener('input', plist); $('pteam').addEventListener('input', plist);

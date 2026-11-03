@@ -58,11 +58,19 @@ const FF = (() => {
     return g;
   }
   /** Projection used for sorting and the builder's projected total: 2026 NQS, else 2026 average, else null. */
-  const proj = (g, ev) => { const p = g?.proj?.[ev]; return p ? (p.nqs ?? p.avg ?? null) : null; };
+  /** AA slot: the derived aa_proj (sum of her 2026 event NQS, else average, over the events she did in 2026). */
+  const proj = (g, ev) => { if (ev === 'aa') return g?.aa_proj?.score ?? null; const p = g?.proj?.[ev]; return p ? (p.nqs ?? p.avg ?? null) : null; };
+  /** "UB+BB 19.810", with any event that used a season average instead of NQS named: "VT+FX 19.500 (FX avg)". */
+  const aaLabel = g => {
+    const a = g?.aa_proj; if (!a) return null;
+    const avg = a.events.filter(e => a.basis[e] === 'avg').map(e => EV_SHORT[e]);
+    return `${a.events.map(e => EV_SHORT[e]).join('+')} ${f3(a.score)}${avg.length ? ` (${avg.join(', ')} avg)` : ''}`;
+  };
   const isDemo = s => s?.demo === true;
-  /** Tag for a gymnast with no projection on an event: NEW = no 2026 NCAA record; no RQS = competed in 2026 but too few scores to rank. */
+  /** Tag for a gymnast with no projection: NEW = no 2026 NCAA record; no RQS = competed in 2026 but too few scores on that
+   *  event to rank; no 2026 scores = on a 2026 roster but no 2026 scores at all (AA slot). */
   const noProj = (g, slot) => (g?.projection_status === 'none' || !g?.rtn_ids?.length) ? '<span class="pill new" title="No 2026 NCAA record">NEW</span>'
-    : slot === 'aa' ? '<span class="pill" title="Not in the 2026 RTN all-around rankings">no AA history</span>' : '<span class="pill" title="No 2026 RQS on this event">no RQS</span>';
+    : slot === 'aa' ? '<span class="pill" title="On a 2026 roster, no 2026 scores">no 2026 scores</span>' : '<span class="pill" title="No 2026 RQS on this event">no RQS</span>';
   const seasonParam = s => (isDemo(s) ? `season=${encodeURIComponent(s.season)}&` : '');
 
   function chrome(active) {
@@ -88,5 +96,5 @@ const FF = (() => {
   const cardUrl = (login, week, s) => `card.html?${seasonParam(s)}u=${encodeURIComponent(login)}&week=${week}`;
   const isDemoLogin = l => /^DEMO-/i.test(l);
 
-  return { REPO, EVENTS, SLOTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
+  return { REPO, EVENTS, SLOTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, aaLabel, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
 })();

@@ -24,29 +24,45 @@ test('best score counts when a gymnast competes twice', () => {
   assert.equal(slotValue([], 'best'), 0);
 });
 
-test('AA only from a meet with all four events; best AA total counts', () => {
-  // e: meet 1 has all four (9.9+9.85+9.8+9.9 = 39.45); meet 2 has no floor -> not an AA.
-  assert.deepEqual(deriveAA(week.scores.e).map(x => [x.meet_id, x.score]), [[1, 39.45]]);
-  assert.deepEqual(deriveAA(week.scores.a), []);
-  const twoAA = { vault: [{ score: 9.9, meet_id: 1 }, { score: 9.95, meet_id: 2 }], bars: [{ score: 9.9, meet_id: 1 }, { score: 9.9, meet_id: 2 }], beam: [{ score: 9.9, meet_id: 1 }, { score: 9.9, meet_id: 2 }], floor: [{ score: 9.9, meet_id: 1 }, { score: 9.95, meet_id: 2 }] };
-  assert.equal(slotValue(deriveAA(twoAA), 'best'), 39.7);
-  assert.equal(slotValue(deriveAA(twoAA), 'average'), 39.65);
+test('AA = sum of every event she did in one meet: 1, 2 or 4 events; best meet counts; no mixing across meets', () => {
+  // d: one event (FX 9.75) -> AA 9.75
+  assert.deepEqual(deriveAA(week.scores.d).map(x => [x.meet_id, x.score, x.events]), [[1, 9.75, ['floor']]]);
+  // b: two events in one meet (VT 9.8 + UB 9.9) -> 19.7
+  assert.deepEqual(deriveAA(week.scores.b).map(x => [x.meet_id, x.score, x.events]), [[1, 19.7, ['vault', 'bars']]]);
+  // e: meet 1 all four (9.9+9.85+9.8+9.9 = 39.45); meet 2 three events (9.85+9.9+9.95 = 29.7)
+  assert.deepEqual(deriveAA(week.scores.e).map(x => [x.meet_id, x.score]), [[1, 39.45], [2, 29.7]]);
+  assert.equal(slotValue(deriveAA(week.scores.e), 'best'), 39.45);
+  assert.equal(slotValue(deriveAA(week.scores.e), 'average'), 34.575);
+  // a: meet 1 VT 9.9 + FX 9.85 = 19.75; meet 2 VT 9.95 alone. Best meet = 19.75, NOT 9.95 + 9.85 = 19.8 (mixed).
+  assert.deepEqual(deriveAA(week.scores.a).map(x => [x.meet_id, x.score]), [[1, 19.75], [2, 9.95]]);
+  assert.equal(slotValue(deriveAA(week.scores.a), 'best'), 19.75);
+  // config options: AA_MIN_EVENTS = 4 restores the all-four rule; AA_SCOPE = 'week' mixes meets
+  assert.deepEqual(deriveAA(week.scores.e, { minEvents: 4 }).map(x => x.score), [39.45]);
+  assert.deepEqual(deriveAA(week.scores.a, { minEvents: 4 }), []);
+  assert.deepEqual(deriveAA(week.scores.a, { scope: 'week' }).map(x => x.score), [19.8]);
+  assert.deepEqual(deriveAA({}), []);
 });
 
-test('lineup total = 4 event scores + 1 AA; DNC = 0', () => {
+test('lineup total = 4 event scores + 1 AA meet sum; DNC = 0', () => {
   const s = scoreLineup(L, week, 'best');
   assert.equal(s.slots.vault.score, 9.95);
   assert.equal(s.slots.bars.score, 9.9);
   assert.equal(s.slots.beam.score, 9.9);
   assert.equal(s.slots.floor.score, 9.75);
   assert.equal(s.slots.aa.score, 39.45);
+  assert.deepEqual(s.slots.aa.events, ['vault', 'bars', 'beam', 'floor']);
   assert.equal(s.total, 78.95);
-  const dnc = scoreLineup({ ...L, aa: 'a' }, week);      // a never did all four
+  const spec = scoreLineup({ ...L, aa: 'a' }, week);     // two-event specialist: VT + FX in meet 1
+  assert.equal(spec.slots.aa.score, 19.75);
+  assert.deepEqual(spec.slots.aa.events, ['vault', 'floor']);
+  assert.equal(spec.total, 59.25);
+  const dnc = scoreLineup({ ...L, aa: 'zz' }, week);     // didn't compete
   assert.equal(dnc.slots.aa.score, 0);
   assert.equal(dnc.slots.aa.competed, false);
   assert.equal(dnc.total, 39.5);
-  // a precomputed scores.<id>.aa wins over derivation
-  assert.equal(scoreLineup(L, { scores: { ...week.scores, e: { ...week.scores.e, aa: [{ score: 39.5, meet_id: 9 }] } } }).slots.aa.score, 39.5);
+  // per-event scores win over a stale stored aa; stored aa is used only when there are no event scores
+  assert.equal(scoreLineup(L, { scores: { ...week.scores, e: { ...week.scores.e, aa: [{ score: 39.5, meet_id: 9 }] } } }).slots.aa.score, 39.45);
+  assert.equal(scoreLineup(L, { scores: { ...week.scores, e: { aa: [{ score: 39.5, meet_id: 9 }] } } }).slots.aa.score, 39.5);
 });
 
 test('validation: 5 slots, known ids, one slot per gymnast, one per team', () => {
@@ -125,4 +141,23 @@ test('DEMO lineups comply and are scored on the new format', () => {
     assert.equal(new Set(Object.values(p.slots).map(s => s.id)).size, 5);
   }
   assert.ok(r.players.some(p => Object.values(p.slots).some(s => !s.competed)), 'bye-week example has a DNC');
+});
+
+test('roster AA projection = sum of her 2026 event NQS (avg where no NQS), never invented', () => {
+  for (const f of ['../../data/gymnasts.json', '../../data/demo/gymnasts-2026.json']) {
+    const gym = JSON.parse(readFileSync(new URL(f, import.meta.url))).gymnasts;
+    let n = 0;
+    for (const g of gym) {
+      if (!g.rtn_ids?.length) { assert.equal(g.aa_proj ?? null, null, `${g.id}: NEW gymnast has an AA projection`); continue; }
+      if (!g.aa_proj) continue;
+      n++;
+      let sum = 0;
+      for (const e of g.aa_proj.events) {
+        if (g.aa_proj.basis[e] === 'nqs') { assert.ok(g.proj?.[e]?.nqs != null, `${g.id} ${e}`); sum += g.proj[e].nqs; }
+        else assert.equal(g.proj?.[e]?.nqs ?? null, null, `${g.id} ${e}: used avg though an NQS exists`);
+      }
+      if (Object.values(g.aa_proj.basis).every(b => b === 'nqs')) assert.equal(Math.round(sum * 1000) / 1000, g.aa_proj.score, g.id);
+    }
+    assert.ok(n > 600, `${f}: only ${n} AA projections`);
+  }
 });
