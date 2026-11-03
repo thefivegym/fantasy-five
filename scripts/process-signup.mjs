@@ -58,11 +58,10 @@ export function signupComment(res) {
   if (res.type === 'reminders') return `Reminders ${r.reminders ? 'on' : 'off'} for @${r.login}. Nothing else changed.`;
   return [
     `${res.updated ? 'Sign-up updated' : 'Signed up'}: @${r.login}. Weekly reminders: ${r.reminders ? 'on' : 'off'}.`,
-    '',
     'Your email is stored encrypted. Only the organizer can read it, and only to reach the season winner.',
-    r.reminders ? 'Reminders arrive as a GitHub mention on Wednesdays before the Friday lock. Check your GitHub email notifications are on.' : '',
+    r.reminders ? 'Reminders arrive as a GitHub mention on Wednesdays before the Friday lock. Check your GitHub email notifications are on.' : null,
     `Build a lineup: ${SITE}/build.html. Just the read.`,
-  ].filter(Boolean).join('\n');
+  ].filter(x => x !== null).join('\n\n');
 }
 
 async function main() {
