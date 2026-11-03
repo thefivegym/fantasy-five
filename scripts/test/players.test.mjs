@@ -73,3 +73,11 @@ test('reminder: Wednesday 10 AM CT across DST, open week only, batched mentions'
   const dry = reminderBodies(season, w1, logins, { dryRun: true });
   assert.equal((dry.body.match(/@p\d+/g) || []).length, 0);                          // dry run mentions nobody
 });
+
+test('winner.mjs: latest scored week, weekly winner with total', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const run = (...a) => execFileSync('node', [new URL('../admin/winner.mjs', import.meta.url).pathname, ...a], { encoding: 'utf8' });
+  assert.match(run('--season=demo'), /^demo week 1 \(Feb 13–19, 2026\), scores final: winner\nDEMO-chalk\t79\.375\t/);
+  assert.equal(run('--season=demo', '--week=1'), run('--season=demo', '--winner'));
+  assert.match(run('--season=demo', '--standings'), /bragging rights, no prize/);
+});

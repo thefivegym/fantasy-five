@@ -26,7 +26,8 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 - A week runs **Friday through Thursday** (America/Chicago dates). Lineups **lock** at the week's `lock`
   timestamp in `data/season.json` (default Friday 5:00 PM CT, before the first meet). Every D1 meet dated in
   the window counts.
-- Highest weekly total wins the week. The season leaderboard is the sum of weekly totals.
+- **Highest weekly total wins.** Weekly winner gets a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Tied for the top score: each gets the prize. The season leaderboard
+  is the sum of weekly totals: standings and bragging rights only, no prize. The DEMO week has no prize.
 - Schema 1 (5 per event, 20 slots) is retired; the workflow rejects it with "Old format".
 
 ## Sign-up (required): GitHub login + Instagram handle
@@ -34,7 +35,7 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 A lineup is only accepted from a GitHub login with `data/players/<login>.json`. Otherwise:
 "Sign up first: https://thefivegym.github.io/fantasy-five/signup.html. Then submit the lineup again."
 GitHub stays the sign-in and the submission method. Instagram is a typed handle (a real "Log in with Instagram"
-needs a server), used so the organizer can DM the season winner.
+needs a server), used so the organizer can DM each weekly winner.
 
 1. `signup.html`: Instagram handle (required) and a weekly-reminder checkbox (default on). The handle is
    normalized by `scripts/lib/instagram.mjs` (shared by the page and the workflow): strip a leading `@` and any
@@ -47,10 +48,11 @@ needs a server), used so the organizer can DM the season winner.
    "Signed up: @login. IG: @handle. Weekly reminders: on.", closes the issue. Signing up again updates the handle
    and keeps `joined_at`. `{"type":"reminders","reminders":false}` (the "Turn reminders off" button) changes only
    the flag. Closed sign-up issues are ignored if edited later.
-3. **Your IG handle is public on the leaderboard. It's how we contact the season winner.** Nothing is encrypted
+3. **Your IG handle is public on the leaderboard. It's how we contact weekly winners.** Nothing is encrypted
    because nothing private is stored.
-4. Organizer: `node scripts/admin/winner.mjs --winner` prints the season #1 (all of them on a tie) with total and
-   IG handle + link. No flag: every signed-up player.
+4. Organizer: `node scripts/admin/winner.mjs` prints the latest scored week's winner(s) with total and IG handle +
+   link (ties: everyone tied for the top score; each gets the prize). `--week=<n>` for a given week, `--standings`
+   for the season table (no prize), `--players` for every signed-up player.
 
 ## Weekly reminder
 
@@ -146,7 +148,7 @@ assets/style.css assets/common.js                                          share
 scripts/lib/{config,scoring,io,names}.mjs                                  game constants + scoring engine
 scripts/process-lineup.mjs  scripts/process-signup.mjs  scripts/remind.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
 scripts/lib/players.mjs scripts/lib/instagram.mjs  scripts/build-players-index.mjs   player records, IG handle rules, public index
-scripts/admin/winner.mjs                                                    season winner(s) + IG handle
+scripts/admin/winner.mjs                                                    weekly winner(s) + IG handle, standings, players
 scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups, schema 2 (2026 RTN rankings + week schedule only)
 scripts/test/scoring.test.mjs                                               node --test scripts/test/*.test.mjs
 scripts/roster/                                                             offline roster builder

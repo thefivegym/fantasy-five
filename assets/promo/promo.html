@@ -22,8 +22,7 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
 .prize{background:var(--gold);color:var(--navy);border-radius:22px}
 .prize .lab{font-weight:900;letter-spacing:.08em;opacity:.8}
 .prize .big{font-weight:900;line-height:1.08}
-.prize .tags{display:flex;gap:12px;flex-wrap:nowrap}
-.prize .tbd{display:inline-block;white-space:nowrap;border:3px solid var(--navy);border-radius:10px;font-weight:800}
+.prize .fine{font-weight:700;opacity:.75}
 .foot{display:flex;justify-content:space-between;align-items:flex-end;border-top:2px solid var(--line)}
 .url{color:var(--ink);font-weight:800}
 .hand{color:var(--mute);font-weight:700}
@@ -36,17 +35,17 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
 .feed .slots{gap:9px}
 .feed .slot{height:64px;padding:0 26px;gap:22px}.feed .slot .k{font-size:30px;width:56px}.feed .slot .n{font-size:30px;width:190px}.feed .slot .d{font-size:23px}
 .feed .rules{gap:6px;margin:18px 0 20px;font-size:27px;color:var(--ink)}
-.feed .prize{padding:26px 32px}.feed .prize .lab{font-size:22px}.feed .prize .big{font-size:42px;margin:6px 0 12px}.feed .prize .tbd{font-size:22px;padding:4px 12px}
+.feed .prize{padding:26px 32px}.feed .prize .lab{font-size:22px}.feed .prize .big{font-size:37px;margin:6px 0 12px}.feed .prize .fine{font-size:22px}
 .feed .foot{margin-top:auto;padding-top:18px}.feed .url{font-size:32px}.feed .hand{font-size:26px;margin-top:6px}.feed .tag{font-size:26px}
 /* ---------- IG story 1080x1920 (text kept inside y 250..1670) ---------- */
-.story{width:1080px;height:1920px;padding:264px 72px 0}
+.story{width:1080px;height:1920px;padding:256px 72px 0}
 .story .kick .t{font-size:38px}.story .kick .s{font-size:27px}
 .story h1{font-size:128px;margin:30px 0 12px}
 .story .lede{font-size:31px;margin-bottom:24px}
 .story .slots{gap:10px}
 .story .slot{height:76px;padding:0 26px;gap:20px}.story .slot .k{font-size:33px;width:62px}.story .slot .n{font-size:32px;width:196px}.story .slot .d{font-size:23px}
-.story .rules{gap:10px;margin:26px 0 26px;font-size:30px}
-.story .prize{padding:30px 34px}.story .prize .lab{font-size:24px}.story .prize .big{font-size:46px;margin:8px 0 14px}.story .prize .tbd{font-size:24px;padding:5px 14px}
+.story .rules{gap:8px;margin:22px 0 22px;font-size:30px}
+.story .prize{padding:30px 34px}.story .prize .lab{font-size:24px}.story .prize .big{font-size:38px;margin:8px 0 12px}.story .prize .fine{font-size:24px}
 .story .foot{margin-top:26px;padding-top:22px}.story .url{font-size:34px}.story .hand{font-size:28px;margin-top:6px}.story .tag{font-size:28px}
 /* ---------- X 1600x900 ---------- */
 .x{width:1600px;height:900px;padding:46px 64px 40px}
@@ -57,7 +56,7 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
 .x .slots{gap:8px}
 .x .slot{height:62px;padding:0 24px;gap:20px}.x .slot .k{font-size:28px;width:52px}.x .slot .n{font-size:28px;width:170px}.x .slot .d{font-size:20px}
 .x .rules{gap:18px;margin:4px 0 0;font-size:25px}
-.x .prize{padding:30px 34px;flex:1;margin-top:28px;display:flex;flex-direction:column;justify-content:center}.x .prize .lab{font-size:22px}.x .prize .big{font-size:46px;margin:12px 0 20px}.x .prize .tbd{font-size:22px;padding:5px 14px}
+.x .prize{padding:30px 34px;flex:1;margin-top:28px;display:flex;flex-direction:column;justify-content:center}.x .prize .lab{font-size:22px}.x .prize .big{font-size:46px;margin:12px 0 20px}.x .prize .fine{font-size:21px;line-height:1.35}
 .x .foot{padding-top:16px;margin-top:20px}.x .url{font-size:30px}.x .hand{font-size:24px;margin-top:4px}.x .tag{font-size:24px}
 .x .right{display:flex;flex-direction:column;padding:14px 0 0}
 </style></head><body>
@@ -73,9 +72,9 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
   <li><span><b>Any D1 gymnast.</b> Five different teams.</span></li>
   <li><span><b>New lineup every week.</b> Nothing carries over.</span></li>
   <li><span><b>Locks Friday 5 PM CT.</b></span></li>
-  <li><span><b>Highest season total wins.</b></span></li>
+  <li><span><b>Highest weekly total wins.</b></span></li>
 </ul></template>
-<template id="prize"><div class="prize"><div class="lab">SEASON PRIZE</div><div class="big">Season winner gets a new leo.<br>Your size.</div><div class="tags"><span class="tbd">Leo Brand: TBD</span><span class="tbd">Leo: TBD</span></div></div></template>
+<template id="prize"><div class="prize"><div class="lab">WEEKLY PRIZE</div><div class="big">Top score each week wins a $25<br>Starbucks gift card + a story shoutout.</div><div class="fine">Digital gift card. Shoutout on @thefivethatscore. Ties each win.</div></div></template>
 <template id="foot"><div class="foot"><div><div class="url">thefivegym.github.io/fantasy-five</div><div class="hand">@thefivethatscore</div></div><div class="tag">Just the read.</div></div></template>
 <div id="root"></div>
 <script>
@@ -86,7 +85,8 @@ const head = `${T('kick')}<h1>FANTASY FIVE</h1><div class="lede">5 picks a week.
 c.innerHTML = f === 'x'
   ? `<div class="cols"><div>${head}${T('slots')}</div><div class="right">${T('rules')}${T('prize')}</div></div>${T('foot')}`
   : `${head}${T('slots')}${T('rules')}${T('prize')}${T('foot')}`;
-if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Season winner<br>gets a new leo.<br>Your size.';
+if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Top score each week<br>wins a $25 Starbucks<br>gift card + a story<br>shoutout.';
+if (f === 'x') c.querySelector('.prize .fine').innerHTML = 'Digital gift card. Ties each win.<br>Shoutout on @thefivethatscore.';
 document.getElementById('root').append(c);
 // overflow report for the checker
 const r = c.getBoundingClientRect(), bad = [];

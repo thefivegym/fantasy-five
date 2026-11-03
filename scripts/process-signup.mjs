@@ -50,7 +50,7 @@ export function signupComment(res) {
   if (res.type === 'reminders') return `Reminders ${r.reminders ? 'on' : 'off'} for @${r.login}. Nothing else changed.`;
   return [
     `${res.updated ? 'Sign-up updated' : 'Signed up'}: @${r.login}. IG: @${r.instagram}. Weekly reminders: ${r.reminders ? 'on' : 'off'}.`,
-    'Your IG handle is public on the leaderboard. It\'s how we contact the season winner.',
+    'Your IG handle is public on the leaderboard. It\'s how we contact weekly winners.',
     r.reminders ? 'Reminders arrive as a GitHub mention on Wednesdays before the Friday lock. Check your GitHub email notifications are on.' : null,
     `Build a lineup: ${SITE}/build.html. Just the read.`,
   ].filter(x => x !== null).join('\n\n');
