@@ -69,6 +69,9 @@ async function main() {
   const issue = ev.issue;
   const out = async (k, v) => process.env.GITHUB_OUTPUT && appendFile(process.env.GITHUB_OUTPUT, `${k}=${v}\n`);
   // Title or label edits (and the bot's own label change) are not a new submission. Only a body edit counts.
+  console.log(`Event: ${ev.action}; issue ${issue?.state}; changed: ${Object.keys(ev.changes || {}).join(',') || 'none'}`);
+  // A closed sign-up issue is done. Re-signing up is a new issue from signup.html.
+  if (issue?.state === 'closed') { console.log('Issue is closed; skipping.'); await out('skip', 'true'); return; }
   if (ev.action === 'edited' && !ev.changes?.body) { console.log('Edit without a body change; skipping.'); await out('skip', 'true'); return; }
   if (!issue || !isSignupIssue(issue)) { console.log('Not a sign-up issue; skipping.'); await out('skip', 'true'); return; }
   const key = await readJson(join(DATA, '..', 'assets', 'email-public-key.json'));
