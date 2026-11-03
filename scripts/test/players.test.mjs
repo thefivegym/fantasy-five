@@ -1,60 +1,52 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
-import { webcrypto, createPrivateKey } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { processSignup, signupComment, isSignupIssue } from '../process-signup.mjs';
 import { processSubmission } from '../process-lineup.mjs';
-import { decryptEmail, KEY_PATH } from '../admin/decrypt-emails.mjs';
+import { normalizeInstagram, checkInstagram } from '../lib/instagram.mjs';
 import { reminderWeek, isReminderHour, reminderBodies, reminderTitle } from '../remind.mjs';
 
-const KEY = JSON.parse(readFileSync(new URL('../../assets/email-public-key.json', import.meta.url)));
-const EMAIL = 'ff5-test-player@example.com';
-async function encrypt(email) {   // exactly what signup.html does in the browser
-  const pub = await webcrypto.subtle.importKey('jwk', KEY.jwk, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
-  return Buffer.from(await webcrypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, new TextEncoder().encode(JSON.stringify({ v: 1, email })))).toString('base64');
-}
-const issue = (payload, extra = '') => ({ number: 7, user: { login: 'TestPlayer' }, title: 'Signup: Fantasy Five player', labels: [], body: `${extra}\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`` });
+const issue = payload => ({ number: 7, user: { login: 'TestPlayer' }, title: 'Signup: Fantasy Five player', labels: [], body: `\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`` });
 const NOW = '2026-11-03T14:00:00Z';
+const S = (instagram, reminders = true) => ({ game: 'fantasy-five', type: 'signup', schema: 2, reminders, instagram });
 
-test('sign-up: shape checks, record, comment never echoes the email', async () => {
-  const ct = await encrypt(EMAIL);
-  assert.equal(Buffer.from(ct, 'base64').length, 384);
-  const ok = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'signup', schema: 1, reminders: true, key_id: KEY.key_id, email_ciphertext: ct }), now: NOW, existing: null, keyId: KEY.key_id });
+test('Instagram handle: normalize and validate', () => {
+  for (const raw of ['@TheFiveThatScore', 'thefivethatscore', ' https://www.instagram.com/TheFiveThatScore/?hl=en ', 'instagram.com/thefivethatscore', 'http://m.instagram.com/thefivethatscore#x', '@@thefivethatscore'])
+    assert.equal(normalizeInstagram(raw), 'thefivethatscore', raw);
+  assert.deepEqual(checkInstagram('@Jane.Doe_99'), { ok: true, handle: 'jane.doe_99' });
+  assert.deepEqual(checkInstagram(''), { ok: false, error: 'Instagram handle is required.' });
+  assert.deepEqual(checkInstagram('@'), { ok: false, error: 'Instagram handle is required.' });
+  assert.deepEqual(checkInstagram('a'.repeat(31)), { ok: false, error: 'Instagram handle is 31 characters. Max 30.' });
+  assert.equal(checkInstagram('a'.repeat(30)).ok, true);
+  for (const bad of ['jane doe', 'jane-doe', 'jané', 'jane!']) assert.deepEqual(checkInstagram(bad), { ok: false, error: 'Instagram handles use only letters, digits, . and _.' }, bad);
+});
+
+test('sign-up: record {login, instagram, joined_at, reminders}; update; reminders only', async () => {
+  const ok = await processSignup({ issue: issue(S('@Jane.Doe')), now: NOW, existing: null });
   assert.equal(ok.ok, true);
   assert.equal(ok.path, 'data/players/testplayer.json');
-  assert.deepEqual(Object.keys(ok.record).sort(), ['email_ciphertext', 'issue', 'joined_at', 'key_id', 'login', 'reminders', 'updated_at']);
-  assert.ok(!JSON.stringify(ok.record).includes(EMAIL));
-  const c = signupComment(ok);
-  assert.match(c, /^Signed up: @TestPlayer\. Weekly reminders: on\./);
-  assert.ok(!c.includes(EMAIL) && !c.includes(ct.slice(0, 20)));
+  assert.deepEqual(ok.record, { login: 'TestPlayer', instagram: 'jane.doe', joined_at: NOW, reminders: true });
+  assert.match(signupComment(ok), /^Signed up: @TestPlayer\. IG: @jane\.doe\. Weekly reminders: on\./);
   assert.ok(isSignupIssue({ title: 'Signup: x', labels: [] }) && isSignupIssue({ title: 'x', labels: [{ name: 'signup' }] }));
-  // re-sign-up keeps joined_at
-  const again = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'signup', schema: 1, reminders: false, key_id: KEY.key_id, email_ciphertext: ct }), now: '2026-12-01T00:00:00Z', existing: ok.record, keyId: KEY.key_id });
-  assert.equal(again.record.joined_at, NOW); assert.equal(again.record.reminders, false); assert.match(signupComment(again), /^Sign-up updated/);
-  // opt-out without email
-  const off = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'reminders', schema: 1, reminders: false }), now: NOW, existing: ok.record, keyId: KEY.key_id });
-  assert.equal(off.record.reminders, false); assert.equal(off.record.email_ciphertext, ct); assert.equal(signupComment(off), 'Reminders off for @TestPlayer. Nothing else changed.');
-  const offNew = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'reminders', schema: 1, reminders: false }), now: NOW, existing: null, keyId: KEY.key_id });
+  const again = await processSignup({ issue: issue(S('instagram.com/jane_2', false)), now: '2026-12-01T00:00:00Z', existing: ok.record });
+  assert.deepEqual(again.record, { login: 'TestPlayer', instagram: 'jane_2', joined_at: NOW, reminders: false });
+  assert.match(signupComment(again), /^Sign-up updated: @TestPlayer\. IG: @jane_2\. Weekly reminders: off\./);
+  const off = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'reminders', schema: 2, reminders: false }), now: NOW, existing: ok.record });
+  assert.deepEqual(off.record, { ...ok.record, reminders: false });
+  assert.equal(signupComment(off), 'Reminders off for @TestPlayer. Nothing else changed.');
+  const offNew = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'reminders', schema: 2, reminders: false }), now: NOW, existing: null });
   assert.match(offNew.errors[0], /^No sign-up on file for @TestPlayer\. Sign up first: /);
 });
 
-test('sign-up: rejects plaintext email, wrong key, bad ciphertext', async () => {
-  const ct = await encrypt(EMAIL);
-  const base = { game: 'fantasy-five', type: 'signup', schema: 1, reminders: true, key_id: KEY.key_id, email_ciphertext: ct };
-  const plain = await processSignup({ issue: issue(base, `my email is ${EMAIL}`), now: NOW, existing: null, keyId: KEY.key_id });
-  assert.equal(plain.ok, false); assert.match(plain.errors[0], /looks like a plain email/);
-  assert.ok(!signupComment(plain).includes(EMAIL));
-  const raw = await processSignup({ issue: issue({ ...base, email_ciphertext: EMAIL }), now: NOW, existing: null, keyId: KEY.key_id });
-  assert.equal(raw.ok, false);
-  const short = await processSignup({ issue: issue({ ...base, email_ciphertext: 'AAAA' }), now: NOW, existing: null, keyId: KEY.key_id });
-  assert.deepEqual(short.errors, ['Encrypted email is missing or the wrong size. Use the sign-up page; it encrypts the email for you.']);
-  const old = await processSignup({ issue: issue({ ...base, key_id: 'ff5-email-old' }), now: NOW, existing: null, keyId: KEY.key_id });
-  assert.match(old.errors[0], /old or unknown key/);
-});
-
-test('organizer decrypt script reads a browser-encrypted sign-up', { skip: !existsSync(KEY_PATH) && 'private key not on this machine' }, async () => {
-  const rec = { login: 'TestPlayer', email_ciphertext: await encrypt(EMAIL) };
-  assert.equal(decryptEmail(rec, createPrivateKey(readFileSync(KEY_PATH))), EMAIL);
+test('sign-up: rejects bad handles, old email schema, unknown keys', async () => {
+  const bad = await processSignup({ issue: issue(S('jane doe')), now: NOW, existing: null });
+  assert.deepEqual(bad.errors, ['Instagram handles use only letters, digits, . and _.']);
+  const none = await processSignup({ issue: issue(S(undefined)), now: NOW, existing: null });
+  assert.deepEqual(none.errors, ['Instagram handle is required.']);
+  const v1 = await processSignup({ issue: issue({ game: 'fantasy-five', type: 'signup', schema: 1, reminders: true, email_ciphertext: 'x' }), now: NOW, existing: null });
+  assert.equal(v1.ok, false);
+  assert.match(v1.errors.join(' '), /Not a current Fantasy Five sign-up/);
+  assert.match(v1.errors.join(' '), /Unknown keys: email_ciphertext/);
 });
 
 test('lineup from a login with no sign-up is rejected', async () => {

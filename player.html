@@ -31,7 +31,8 @@ FF.chrome('');
   const sid = String(s.season);
   const lb = await FF.json(`data/leaderboard/${sid}.json`, { weeks: [], players: [] });
   const me = lb.players.find(p => p.login.toLowerCase() === u.toLowerCase());
-  $('title').innerHTML = `${FF.esc(me?.login || u)} ${FF.isDemo(s) ? '<span class="demo-tag">DEMO</span>' : ''}`;
+  const ig = FF.igOf(await FF.players(), me?.login || u);
+  $('title').innerHTML = `${FF.esc(me?.login || u)} ${ig ? `<span class="sub" style="font-size:.8em">${FF.igLink(ig)}</span>` : ''} ${FF.isDemo(s) ? '<span class="demo-tag">DEMO</span>' : ''}`;
   document.title = `${me?.login || u} — Fantasy Five`;
   const gh = FF.isDemoLogin(u) ? '<span class="sub">Sample DEMO player, not a GitHub account.</span>' : `<a href="https://github.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">github.com/${FF.esc(u)}</a>`;
   if (!me) { $('summary').innerHTML = `<p>No scored weeks for ${FF.esc(u)} in ${FF.isDemo(s) ? 'the DEMO' : sid}. ${gh}</p>`; return; }

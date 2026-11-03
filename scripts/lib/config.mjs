@@ -38,8 +38,7 @@ export const SIGNUP_LABEL = 'signup';
 export const SIGNUP_TITLE_PREFIX = 'Signup:';
 export const SITE = 'https://thefivegym.github.io/fantasy-five';
 export const SIGNUP_URL = `${SITE}/signup.html`;
-// Email is encrypted in the browser with assets/email-public-key.json (RSA-OAEP, SHA-256, 3072-bit).
-export const EMAIL_CIPHERTEXT_BYTES = 384;
+// Sign-up stores the player's Instagram handle (plain text, public) so the organizer can DM the winner.
 
 // Weekly reminder issue: Wednesday 10:00 AM America/Chicago before the Friday lock.
 export const REMINDER_LABEL = 'reminder';

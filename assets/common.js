@@ -67,6 +67,10 @@ const FF = (() => {
     return `${a.events.map(e => EV_SHORT[e]).join('+')} ${f3(a.score)}${avg.length ? ` (${avg.join(', ')} avg)` : ''}`;
   };
   const isDemo = s => s?.demo === true;
+  /** login -> IG handle, from data/players.json (built from sign-ups). */
+  const players = async () => (await json('data/players.json', { players: {} })).players || {};
+  const igOf = (P, login) => P[login]?.instagram || Object.entries(P).find(([k]) => k.toLowerCase() === String(login).toLowerCase())?.[1]?.instagram || null;
+  const igLink = h => (h ? `<a class="ig" href="https://instagram.com/${encodeURIComponent(h)}" target="_blank" rel="noopener">@${esc(h)}</a>` : '');
   /** Tag for a gymnast with no projection: NEW = no 2026 NCAA record; no RQS = competed in 2026 but too few scores on that
    *  event to rank; no 2026 scores = on a 2026 roster but no 2026 scores at all (AA slot). */
   const noProj = (g, slot) => (g?.projection_status === 'none' || !g?.rtn_ids?.length) ? '<span class="pill new" title="No 2026 NCAA record">NEW</span>'
@@ -96,5 +100,5 @@ const FF = (() => {
   const cardUrl = (login, week, s) => `card.html?${seasonParam(s)}u=${encodeURIComponent(login)}&week=${week}`;
   const isDemoLogin = l => /^DEMO-/i.test(l);
 
-  return { REPO, EVENTS, SLOTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, aaLabel, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
+  return { REPO, EVENTS, SLOTS, EV_SHORT, EV_NAME, json, esc, f3, fTot, q, fmtCT, fmtDate, seasons, season, openWeek, weekState, countdown, gymnasts, proj, aaLabel, players, igOf, igLink, chrome, demoBanner, noProj, config, isDemo, seasonParam, playerUrl, cardUrl, isDemoLogin };
 })();

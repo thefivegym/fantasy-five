@@ -20,21 +20,22 @@
   <h2>Sign up</h2>
   <p class="sub">Once per season, before your first lineup. A lineup from a GitHub login with no sign-up is not accepted. Your GitHub login is your player name.</p>
   <section class="card">
-    <h3>Email and reminders</h3>
+    <h3>Instagram and reminders</h3>
     <form id="f" novalidate>
-      <label class="field"><span>Email <b>(required)</b>. Used for one thing: reaching the season winner about the prize.</span>
-        <input type="email" id="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label>
+      <label class="field"><span>Instagram handle <b>(required)</b></span>
+        <input type="text" id="ig" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="80" placeholder="@yourhandle"></label>
+      <p class="sub" id="igprev"></p>
       <label class="check"><input type="checkbox" id="rem" checked> Weekly reminder to fill my lineup (Wednesday 10 AM CT, before the Friday lock)</label>
       <p class="sub" id="err" role="alert"></p>
-      <button class="btn primary" id="go" type="submit">Encrypt and open GitHub issue</button>
+      <button class="btn primary" id="go" type="submit">Open GitHub issue</button>
     </form>
-    <p class="sub">GitHub issues are public, so your email never goes into one in plain text. This page encrypts it in your browser (RSA-OAEP, SHA-256) with the organizer's public key before the issue opens. The issue, the repo and the site only ever hold the scrambled version. Only the organizer's private key, which is not on GitHub, can read it.</p>
-    <p class="sub">Then press <b>Create</b> on GitHub. A bot saves your sign-up, comments, and closes the issue within a minute or two. Signing up again replaces your email and reminder setting.</p>
+    <p class="sub"><b>Your IG handle is public on the leaderboard. It's how we contact the season winner.</b> A handle or instagram.com link both work; it's saved lowercase, letters, digits, . and _ only, up to 30 characters.</p>
+    <p class="sub">Then press <b>Create</b> on GitHub. A bot saves your sign-up, comments, and closes the issue within a minute or two. Signing up again replaces your handle and reminder setting.</p>
     <p class="sub"><b>Reminders arrive as a GitHub mention. Check your GitHub email notifications are on</b> (GitHub → Settings → Notifications → Email for participating and @mentions).</p>
   </section>
   <section class="card">
     <h3>Reminders only</h3>
-    <p class="sub">Already signed up? Change reminders without re-entering your email.</p>
+    <p class="sub">Already signed up? Change reminders without re-entering your handle.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" id="off" href="#">Turn reminders off</a><a class="btn" id="on" href="#">Turn reminders on</a></div>
   </section>
 </main>
@@ -44,25 +45,21 @@
   const $ = id => document.getElementById(id);
   const issueUrl = (title, intro, payload) => `https://github.com/${FF.REPO}/issues/new?labels=signup&title=${encodeURIComponent(title)}&body=${encodeURIComponent(`<!-- ${intro} Press "Create". Don't edit the JSON block. -->\n${intro}\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n`)}`;
   for (const [id, on] of [['off', false], ['on', true]])
-    $(id).href = issueUrl(`Signup: reminders ${on ? 'on' : 'off'}`, `Fantasy Five: reminders ${on ? 'on' : 'off'}.`, { game: 'fantasy-five', type: 'reminders', schema: 1, reminders: on });
-  const KEY = await FF.json('assets/email-public-key.json');
-  const pub = await crypto.subtle.importKey('jwk', KEY.jwk, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
-  const valid = e => e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-  const b64 = buf => { let s = ''; new Uint8Array(buf).forEach(b => (s += String.fromCharCode(b))); return btoa(s); };
-  /** Exposed for the test harness: returns the issue URL for an email + reminder choice. */
-  window.ffSignupUrl = async (email, reminders) => {
-    const ct = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pub, new TextEncoder().encode(JSON.stringify({ v: 1, email })));
-    return issueUrl('Signup: Fantasy Five player', `Fantasy Five sign-up. Reminders ${reminders ? 'on' : 'off'}. Email encrypted.`,
-      { game: 'fantasy-five', type: 'signup', schema: 1, reminders, key_id: KEY.key_id, email_ciphertext: b64(ct) });
+    $(id).href = issueUrl(`Signup: reminders ${on ? 'on' : 'off'}`, `Fantasy Five: reminders ${on ? 'on' : 'off'}.`, { game: 'fantasy-five', type: 'reminders', schema: 2, reminders: on });
+  const { checkInstagram } = await import(new URL('scripts/lib/instagram.mjs', location.href).href);
+  /** Exposed for the test harness: returns the issue URL for a handle + reminder choice, or throws the error. */
+  window.ffSignupUrl = (raw, reminders) => {
+    const c = checkInstagram(raw); if (!c.ok) throw new Error(c.error);
+    return issueUrl('Signup: Fantasy Five player', `Fantasy Five sign-up. IG: @${c.handle}. Reminders ${reminders ? 'on' : 'off'}.`,
+      { game: 'fantasy-five', type: 'signup', schema: 2, reminders, instagram: c.handle });
   };
-  $('f').addEventListener('submit', async e => {
+  $('ig').addEventListener('input', () => { const c = checkInstagram($('ig').value); $('igprev').textContent = $('ig').value.trim() ? (c.ok ? `Saved as @${c.handle}` : c.error) : ''; });
+  $('f').addEventListener('submit', e => {
     e.preventDefault();
-    const email = $('email').value.trim();
-    if (!valid(email)) { $('err').textContent = 'That is not an email address. One is required.'; $('email').focus(); return; }
+    const c = checkInstagram($('ig').value);
+    if (!c.ok) { $('err').textContent = c.error; $('ig').focus(); return; }
     $('err').textContent = '';
-    const url = await window.ffSignupUrl(email, $('rem').checked);
-    $('email').value = '';
-    location.href = url;
+    location.href = window.ffSignupUrl(c.handle, $('rem').checked);
   });
 })().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load: ' + e.message; });
 </script>

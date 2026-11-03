@@ -29,29 +29,28 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 - Highest weekly total wins the week. The season leaderboard is the sum of weekly totals.
 - Schema 1 (5 per event, 20 slots) is retired; the workflow rejects it with "Old format".
 
-## Sign-up (required) and the encrypted email
+## Sign-up (required): GitHub login + Instagram handle
 
 A lineup is only accepted from a GitHub login with `data/players/<login>.json`. Otherwise:
 "Sign up first: https://thefivegym.github.io/fantasy-five/signup.html. Then submit the lineup again."
+GitHub stays the sign-in and the submission method. Instagram is a typed handle (a real "Log in with Instagram"
+needs a server), used so the organizer can DM the season winner.
 
-1. `signup.html`: the player enters an email (required, validated) and a weekly-reminder checkbox (default on).
-   The page encrypts `{"v":1,"email":…}` **in the browser** with WebCrypto RSA-OAEP (SHA-256, 3072-bit) using
-   `assets/email-public-key.json`, then opens a pre-filled issue titled `Signup: …` (label `signup`) whose JSON is
-   `{"game":"fantasy-five","type":"signup","schema":1,"reminders":true,"key_id":…,"email_ciphertext":<base64>}`.
-   The plaintext email never goes into the issue, the repo, Action logs or the site.
-2. `.github/workflows/signup.yml` → `scripts/process-signup.mjs` checks the shape (key id matches, ciphertext is
-   exactly 384 bytes, no plain-looking email anywhere in the issue), writes `data/players/<login>.json`, comments a
-   dry confirmation (never the email or ciphertext), closes the issue. Signing up again replaces the email and
-   setting and keeps `joined_at`. `{"type":"reminders","reminders":false}` (the "Turn reminders off" button)
-   changes only the reminder flag.
-3. Actions cannot decrypt anything: the **private key is not in the repo or in GitHub**. It lives only on the
-   organizer's machine (`/home/box/.secrets/fantasy-five/email-private-key`, mode 600). `.gitignore` blocks
-   `*private-key*`, `*.pem`, `*.key`, `.secrets/`. `data/players/` is left out of the Pages deploy.
-4. Organizer only, locally: `node scripts/admin/decrypt-emails.mjs --winner` (season #1 from the leaderboard),
-   `--login=<login>`, or no flag for everyone. Prints `login, email, reminders`. Refuses to run in Actions.
-
-Rotating the key: generate a new pair, replace `assets/email-public-key.json` (new `key_id`); old sign-ups stay
-readable with the old private key, new ones are rejected until the page reloads with the new key.
+1. `signup.html`: Instagram handle (required) and a weekly-reminder checkbox (default on). The handle is
+   normalized by `scripts/lib/instagram.mjs` (shared by the page and the workflow): strip a leading `@` and any
+   `instagram.com/` URL, lowercase, then letters, digits, `.` and `_` only, 1 to 30 characters. The page opens a
+   pre-filled issue titled `Signup: …` (label `signup`) with
+   `{"game":"fantasy-five","type":"signup","schema":2,"reminders":true,"instagram":"handle"}`.
+2. `.github/workflows/signup.yml` → `scripts/process-signup.mjs` validates it the same way, writes
+   `data/players/<login>.json` = `{login, instagram, joined_at, reminders}` and the public index
+   `data/players.json` (login → handle, which the leaderboard, player pages and result cards read), comments
+   "Signed up: @login. IG: @handle. Weekly reminders: on.", closes the issue. Signing up again updates the handle
+   and keeps `joined_at`. `{"type":"reminders","reminders":false}` (the "Turn reminders off" button) changes only
+   the flag. Closed sign-up issues are ignored if edited later.
+3. **Your IG handle is public on the leaderboard. It's how we contact the season winner.** Nothing is encrypted
+   because nothing private is stored.
+4. Organizer: `node scripts/admin/winner.mjs --winner` prints the season #1 (all of them on a tie) with total and
+   IG handle + link. No flag: every signed-up player.
 
 ## Weekly reminder
 
@@ -108,7 +107,8 @@ and run `node scripts/score.mjs`.
 | `data/teams.json` | D1 teams: `id`, `name`, `rtn_tid`, `conference`, `roster_url`, `roster_source` (parser), `roster_status` (`official-2026-27` or `provisional-rtn-2026`), `roster_count`, `note`. |
 | `data/season.json` | `season` (2027), `roster`, `week_rule`, `scoring`, `weeks:[{week,label,start,end,lock,status}]`, and a `demo` pointer. |
 | `data/scores/<season>/<week>.json` | `{status: partial/final, window, meets:[{meet_id,date,teams,url}], scores:{<gymnast_id>:{vault:[{score,meet_id,date}],bars,beam,floor,aa:[{score,meet_id,date}]}}, unmatched:[…]}`. `aa` has one entry per meet: `{score, meet_id, date, events}`, the sum of every event she did in that meet. The scorer always re-derives it from the event scores (stored `aa` is used only if a gymnast has no event scores). |
-| `data/players/<login>.json` | `{login, joined_at, updated_at, reminders, key_id, email_ciphertext, issue}`. `email_ciphertext` = base64 RSA-OAEP-256 of `{"v":1,"email":…}`; only the organizer's private key opens it. Not deployed to Pages. |
+| `data/players/<login>.json` | `{login, instagram, joined_at, reminders}`. Public. |
+| `data/players.json` | `{generated_at, players:{<login>:{instagram}}}`, rebuilt by the sign-up workflow and at deploy. |
 | `data/lineups/<season>/<week>/<login>.json` | `{schema: 2, login, season, week, submitted_at, issue, issue_url, lineup:{vault:id, bars:id, beam:id, floor:id, aa:id}}`. A file with `"test": true`, or any schema other than 2, is ignored by scoring. |
 | `data/results/<season>/<week>.json` | `{mode, schema, scores_status, players:[{login,rank,total,slots:{vault:{id,name,team,score,competed,meets},bars,beam,floor,aa:{…,events}}}]}` |
 | `data/leaderboard/<season>.json` | `{weeks, players:[{login,rank,total,weeks_played,best_week,weeks:{<n>:{total,rank,of}}}]}` |
@@ -142,12 +142,11 @@ leaderboard, player pages and cards working. To remove it: delete `data/demo/`, 
 
 ```
 index.html roster.html build.html leaderboard.html player.html card.html signup.html   site (vanilla JS, no build)
-assets/email-public-key.json                                               public key for in-browser email encryption
 assets/style.css assets/common.js                                          shared style + helpers
 scripts/lib/{config,scoring,io,names}.mjs                                  game constants + scoring engine
 scripts/process-lineup.mjs  scripts/process-signup.mjs  scripts/remind.mjs  scripts/score.mjs  scripts/fetch-scores-rtn.mjs
-scripts/lib/players.mjs                                                     player records
-scripts/admin/decrypt-emails.mjs                                            organizer only, local: decrypt emails
+scripts/lib/players.mjs scripts/lib/instagram.mjs  scripts/build-players-index.mjs   player records, IG handle rules, public index
+scripts/admin/winner.mjs                                                    season winner(s) + IG handle
 scripts/seed-demo.mjs                                                       builds the 5 sample DEMO-* lineups, schema 2 (2026 RTN rankings + week schedule only)
 scripts/test/scoring.test.mjs                                               node --test scripts/test/*.test.mjs
 scripts/roster/                                                             offline roster builder

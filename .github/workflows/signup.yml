@@ -15,7 +15,6 @@ jobs:
         with: { ref: main }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      # The email is already encrypted in the browser. Nothing here can decrypt it, and the script never logs the body.
       - id: p
         run: node scripts/process-signup.mjs
       - name: Commit player record
@@ -27,7 +26,7 @@ jobs:
         run: |
           git config user.name "fantasy-five-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$PLAYER_PATH"
+          git add -- "$PLAYER_PATH" data/players.json
           if git diff --cached --quiet; then echo "No change"; exit 0; fi
           git commit -m "Player: $LOGIN (#$ISSUE)"
           for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push origin HEAD:main && exit 0; sleep $((i*3)); done

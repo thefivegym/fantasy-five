@@ -1,7 +1,8 @@
-// Player records: data/players/<login>.json = {login, joined_at, updated_at, reminders, email_ciphertext, key_id, issue}.
+// Player records: data/players/<login>.json = {login, instagram, joined_at, reminders}.
+// data/players.json = {generated_at, players:{<login>: {instagram}}}: the public index the site reads.
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { DATA, readJson } from './io.mjs';
+import { DATA, readJson, writeJson } from './io.mjs';
 
 export const playerPath = login => join('data', 'players', `${String(login).toLowerCase()}.json`);
 export async function loadPlayer(login) { return readJson(join(DATA, 'players', `${String(login).toLowerCase()}.json`), null); }
@@ -11,4 +12,10 @@ export async function loadPlayers() {
   const out = [];
   for (const f of files.sort()) { const p = await readJson(join(DATA, 'players', f), null); if (p && !p.test) out.push(p); }
   return out;
+}
+export async function writePlayersIndex(path = join(DATA, 'players.json')) {
+  const ps = await loadPlayers();
+  const idx = { generated_at: new Date().toISOString(), players: Object.fromEntries(ps.map(p => [p.login, { instagram: p.instagram || null }])) };
+  await writeJson(path, idx);
+  return idx;
 }
