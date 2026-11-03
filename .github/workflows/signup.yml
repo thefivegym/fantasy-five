@@ -5,9 +5,13 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
+  id-token: write
 concurrency: { group: players, cancel-in-progress: false }
 jobs:
   signup:
+    outputs:
+      accepted: ${{ steps.p.outputs.accepted }}
     if: contains(github.event.issue.labels.*.name, 'signup') || startsWith(github.event.issue.title, 'Signup:')
     runs-on: ubuntu-latest
     steps:
@@ -41,3 +45,7 @@ jobs:
           gh issue edit "$ISSUE" --add-label signup || true
           gh issue comment "$ISSUE" --body-file signup-comment.md
           if [ "$ACCEPTED" = "true" ]; then gh issue close "$ISSUE" --reason completed; else gh issue close "$ISSUE" --reason "not planned"; fi
+  deploy:
+    needs: signup
+    if: needs.signup.outputs.accepted == 'true'
+    uses: ./.github/workflows/deploy.yml
