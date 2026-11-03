@@ -13,7 +13,7 @@ Fantasy Five. A weekly fantasy game for NCAA D1 women's gymnastics.
 
 Any D1 gymnast. Five different teams. New lineup every week; nothing carries over. Lineups lock Friday 5 PM CT. Highest season total wins.
 
-Season prize: a new leo for the winner. Your size. Brand TBD.
+Season prize: a new leo for the winner. Your size. Leo brand: TBD. Leo: TBD.
 
 2027 season starts in January. Rules, rosters and the builder: thefivegym.github.io/fantasy-five (link in bio).
 
