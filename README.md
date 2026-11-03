@@ -26,7 +26,7 @@ Weekly fantasy game for NCAA Division I women's artistic gymnastics, by The Five
 - A week runs **Friday through Thursday** (America/Chicago dates). Lineups **lock** at the week's `lock`
   timestamp in `data/season.json` (default Friday 5:00 PM CT, before the first meet). Every D1 meet dated in
   the window counts.
-- **Highest weekly total wins.** Weekly winner gets a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Tied for the top score: each gets the prize. The season leaderboard
+- **Highest weekly total wins.** Weekly winner gets a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Tied for the top score: the $25 Starbucks gift card is split evenly between the tied players (e.g. two-way tie = $12.50 each), and every tied player gets the story shoutout. The season leaderboard
   is the sum of weekly totals: standings and bragging rights only, no prize. The DEMO week has no prize.
 - Schema 1 (5 per event, 20 slots) is retired; the workflow rejects it with "Old format".
 
@@ -51,7 +51,8 @@ needs a server), used so the organizer can DM each weekly winner.
 3. **Your IG handle is public on the leaderboard. It's how we contact weekly winners.** Nothing is encrypted
    because nothing private is stored.
 4. Organizer: `node scripts/admin/winner.mjs` prints the latest scored week's winner(s) with total and IG handle +
-   link (ties: everyone tied for the top score; each gets the prize). `--week=<n>` for a given week, `--standings`
+   link (ties: everyone tied for the top score, each with their share of the split gift card, e.g. 2-way = $12.50 each,
+   3-way = $8.34/$8.33/$8.33). `--week=<n>` for a given week, `--standings`
    for the season table (no prize), `--players` for every signed-up player.
 
 ## Weekly reminder

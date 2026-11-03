@@ -62,7 +62,7 @@ FF.chrome('leaderboard.html');
     $('week').hidden = view !== 'week';
     const pn = $('prizenote'); pn.hidden = FF.isDemo(s);
     pn.innerHTML = view === 'season' ? 'Season standings: bragging rights only. No prize. The prize is weekly.'
-      : '<b>Weekly prize:</b> top score this week wins a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Ties each get one.';
+      : '<b>Weekly prize:</b> top score this week wins a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Ties split the gift card evenly (two-way tie = $12.50 each); every tied player gets the shoutout.';
     const thead = document.querySelector('#tbl thead'), tbody = document.querySelector('#tbl tbody');
     if (view === 'season') {
       $('title').textContent = `Season leaderboard · ${FF.isDemo(s) ? 'DEMO' : sid}`;

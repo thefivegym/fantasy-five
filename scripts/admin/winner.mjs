@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Weekly winner(s) and their Instagram handles, for the organizer to send the prize and the story shoutout.
-// Prize: top weekly total. Ties for the top score: each gets the prize.
+// Prize: top weekly total wins the $25 gift card + story shoutout. Ties for the top score: the gift card is split
+// evenly to the cent (e.g. 2-way = $12.50 each, 3-way = $8.34/$8.33/$8.33); every tied player gets the shoutout.
 // Usage:
 //   node scripts/admin/winner.mjs                     latest scored week's winner(s) (same as --winner)
 //   node scripts/admin/winner.mjs --week=3            week 3's winner(s)
@@ -11,6 +12,8 @@ import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DATA, readJson, parseArgs } from '../lib/io.mjs';
 import { loadPlayers, loadPlayer } from '../lib/players.mjs';
+import { WEEKLY_PRIZE_CENTS } from '../lib/config.mjs';
+import { splitPrize, usd } from '../lib/scoring.mjs';
 
 const a = parseArgs();
 const ig = h => (h ? `@${h}  https://instagram.com/${h}` : '(no IG on file)');
@@ -40,7 +43,9 @@ if (a.players) {
   const top = r.players.filter(p => p.rank === 1);
   if (!top.length) { console.log(`${sid} week ${wk}: no lineups.`); process.exit(0); }
   const label = (main.season === Number(sid) ? main : await readJson(join(DATA, 'demo', 'season.json'), main)).weeks?.find(w => w.week === wk)?.label;
-  console.log(`${sid} week ${wk}${label ? ` (${label})` : ''}, scores ${r.scores_status}: ${top.length > 1 ? `${top.length}-way tie, each gets the prize` : 'winner'}`);
-  for (const p of top) console.log(`${p.login}\t${p.total}\t${ig((await loadPlayer(p.login))?.instagram)}`);
+  console.log(`${sid} week ${wk}${label ? ` (${label})` : ''}, scores ${r.scores_status}: ${top.length > 1 ? `${top.length}-way tie, ${usd(WEEKLY_PRIZE_CENTS)} gift card split evenly, every tied player gets the shoutout` : 'winner'}`);
+  const shares = splitPrize(WEEKLY_PRIZE_CENTS, top.length);
+  for (const [i, p] of top.entries()) console.log(`${p.login}\t${p.total}\t${ig((await loadPlayer(p.login))?.instagram)}\tgift card ${usd(shares[i])} + shoutout`);
+  if (sid === 'demo') console.log('DEMO season: no real prize. Shares shown for illustration.');
   if (r.scores_status !== 'final') console.log('Scores are not final yet. Check again before sending the prize.');
 }

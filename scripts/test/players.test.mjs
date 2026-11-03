@@ -77,7 +77,19 @@ test('reminder: Wednesday 10 AM CT across DST, open week only, batched mentions'
 test('winner.mjs: latest scored week, weekly winner with total', async () => {
   const { execFileSync } = await import('node:child_process');
   const run = (...a) => execFileSync('node', [new URL('../admin/winner.mjs', import.meta.url).pathname, ...a], { encoding: 'utf8' });
-  assert.match(run('--season=demo'), /^demo week 1 \(Feb 13–19, 2026\), scores final: winner\nDEMO-chalk\t79\.375\t/);
+  assert.match(run('--season=demo'), /^demo week 1 \(Feb 13–19, 2026\), scores final: winner\nDEMO-chalk\t79\.375\t.*\tgift card \$25\.00 \+ shoutout\n/);
   assert.equal(run('--season=demo', '--week=1'), run('--season=demo', '--winner'));
   assert.match(run('--season=demo', '--standings'), /bragging rights, no prize/);
+});
+
+test('weekly prize: ties split the gift card to the cent', async () => {
+  const { splitPrize, usd } = await import('../lib/scoring.mjs');
+  const { WEEKLY_PRIZE_CENTS } = await import('../lib/config.mjs');
+  assert.equal(WEEKLY_PRIZE_CENTS, 2500);
+  assert.deepEqual(splitPrize(2500, 1).map(usd), ['$25.00']);
+  assert.deepEqual(splitPrize(2500, 2).map(usd), ['$12.50', '$12.50']);
+  assert.deepEqual(splitPrize(2500, 3).map(usd), ['$8.34', '$8.33', '$8.33']);
+  assert.deepEqual(splitPrize(2500, 4).map(usd), ['$6.25', '$6.25', '$6.25', '$6.25']);
+  for (let n = 1; n <= 12; n++) assert.equal(splitPrize(2500, n).reduce((a, b) => a + b), 2500);
+  assert.throws(() => splitPrize(2500, 0));
 });

@@ -13,7 +13,7 @@ Fantasy Five. A weekly fantasy game for NCAA D1 women's gymnastics.
 
 Any D1 gymnast. Five different teams. New lineup every week; nothing carries over. Lineups lock Friday 5 PM CT. Highest weekly total wins.
 
-Weekly prize: the top score each week wins a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Tied for the top score: each gets the prize. The season leaderboard is bragging rights only.
+Weekly prize: the top score each week wins a $25 digital Starbucks gift card and a story shoutout on @thefivethatscore. Ties split the gift card; everyone tied gets the shoutout. The season leaderboard is bragging rights only.
 
 2027 season starts in January. Rules, rosters and the builder: thefivegym.github.io/fantasy-five (link in bio).
 

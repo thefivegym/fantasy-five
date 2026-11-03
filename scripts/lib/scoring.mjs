@@ -88,6 +88,15 @@ export function scoreLineup(lineup, weekScores, mode = MULTI_MEET_MODE) {
   return { total: r3(total), slots };
 }
 
+/** Split a prize of `cents` evenly across n tied winners, to the cent. Leftover cents go to the first shares:
+ *  splitPrize(2500, 3) -> [834, 833, 833]. */
+export function splitPrize(cents, n) {
+  if (!Number.isInteger(cents) || cents < 0 || !Number.isInteger(n) || n < 1) throw new Error('splitPrize: bad input');
+  const base = Math.floor(cents / n), extra = cents - base * n;
+  return Array.from({ length: n }, (_, i) => base + (i < extra ? 1 : 0));
+}
+export const usd = cents => `$${(cents / 100).toFixed(2)}`;
+
 /** Rank an array of {login,total}. Ties share a rank (1,2,2,4). */
 export function rank(rows, key = 'total') {
   const sorted = [...rows].sort((a, b) => b[key] - a[key] || a.login.localeCompare(b.login));

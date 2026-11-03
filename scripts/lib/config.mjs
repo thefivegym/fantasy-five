@@ -29,6 +29,11 @@ export const AA_SCOPE = 'meet';        // 'meet' = never mix events across meets
 // timestamp, which is what the workflows actually enforce.
 export const DEFAULT_LOCK = { weekday: 'Friday', time: '17:00', tz: 'America/Chicago' };
 
+// Weekly prize: top weekly total wins a $25 digital Starbucks gift card + a story shoutout on @thefivethatscore.
+// Tied for the top score: the gift card is split evenly (to the cent; leftover cents go to the first players listed,
+// e.g. 3-way = $8.34/$8.33/$8.33) and every tied player gets the story shoutout.
+export const WEEKLY_PRIZE_CENTS = 2500;
+
 export const REPO = 'thefivegym/fantasy-five';
 export const LINEUP_TITLE_PREFIX = 'Lineup:';
 export const LINEUP_LABEL = 'lineup';

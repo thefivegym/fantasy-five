@@ -84,7 +84,7 @@ h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
   <li><span><b>Locks Friday 5 PM CT.</b></span></li>
   <li><span><b>Highest weekly total wins.</b></span></li>
 </ul></template>
-<template id="prize"><div class="prize"><div class="lab">WEEKLY PRIZE</div><div class="big">Top score each week wins a $25<br>Starbucks gift card + a story shoutout.</div><div class="fine">Digital gift card. Shoutout on @thefivethatscore. Ties each win.</div></div></template>
+<template id="prize"><div class="prize"><div class="lab">WEEKLY PRIZE</div><div class="big">Top score each week wins a $25<br>Starbucks gift card + a story shoutout.</div><div class="fine">Digital gift card. Shoutout on @thefivethatscore. Ties split the card.</div></div></template>
 <template id="foot"><div class="foot"><div><div class="url">thefivegym.github.io/fantasy-five</div><div class="hand">@thefivethatscore</div></div><div class="tag">Just the read.</div></div></template>
 <div id="root"></div>
 <script>
@@ -98,7 +98,7 @@ c.innerHTML = f === 'card'
   ? `<div class="cols"><div>${head}${T('slots')}</div><div class="right">${T('rules')}${T('prize')}</div></div>${T('foot')}`
   : `${head}${T('slots')}${T('rules')}${T('prize')}${T('foot')}`;
 if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Top score each week<br>wins a $25 Starbucks<br>gift card + a story<br>shoutout.';
-if (f === 'x') c.querySelector('.prize .fine').innerHTML = 'Digital gift card. Ties each win.<br>Shoutout on @thefivethatscore.';
+if (f === 'x') c.querySelector('.prize .fine').innerHTML = 'Digital gift card. Ties split the card;<br>all tied get the shoutout on @thefivethatscore.';
 document.getElementById('root').append(c);
 // overflow report for the checker
 const r = c.getBoundingClientRect(), bad = [];
