@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+:root{--navy:#14112b;--gold:#ffcf4a;--ink:#f1effa;--mute:#a29fb8;--line:#2c2847;--card:#1a1730}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-variant-numeric:tabular-nums}
+.c{position:relative;overflow:hidden;background:var(--navy);display:flex;flex-direction:column}
+.kick{border-left:8px solid var(--gold);padding-left:22px}
+.kick .t{color:var(--gold);font-weight:900;letter-spacing:.02em}
+.kick .s{color:var(--mute);font-weight:600;margin-top:6px}
+h1{font-weight:900;color:var(--gold);line-height:.92;letter-spacing:-.01em}
+.lede{font-weight:700;color:var(--ink)}
+.slots{display:flex;flex-direction:column}
+.slot{display:flex;align-items:center;border:2px solid var(--line);border-radius:18px}
+.slot .k{color:var(--gold);font-weight:900}
+.slot .n{font-weight:800}
+.slot .d{color:var(--mute);font-weight:500}
+.rules{list-style:none;display:flex;flex-direction:column}
+.rules li{display:flex;gap:16px;font-weight:600}
+.rules li::before{content:"";flex:none;width:10px;height:10px;border-radius:2px;background:var(--gold);margin-top:.45em}
+.rules b{color:var(--ink);font-weight:800}
+.prize{background:var(--gold);color:var(--navy);border-radius:22px}
+.prize .lab{font-weight:900;letter-spacing:.08em;opacity:.8}
+.prize .big{font-weight:900;line-height:1.08}
+.prize .tbd{display:inline-block;border:3px solid var(--navy);border-radius:10px;font-weight:800}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;border-top:2px solid var(--line)}
+.url{color:var(--ink);font-weight:800}
+.hand{color:var(--mute);font-weight:700}
+.tag{color:var(--mute);font-weight:600}
+/* ---------- IG feed 1080x1350 ---------- */
+.feed{width:1080px;height:1350px;padding:60px 64px 52px}
+.feed .kick .t{font-size:34px}.feed .kick .s{font-size:24px}
+.feed h1{font-size:132px;margin:26px 0 10px}
+.feed .lede{font-size:33px;margin-bottom:22px}
+.feed .slots{gap:9px}
+.feed .slot{height:64px;padding:0 26px;gap:22px}.feed .slot .k{font-size:30px;width:56px}.feed .slot .n{font-size:30px;width:190px}.feed .slot .d{font-size:23px}
+.feed .rules{gap:6px;margin:18px 0 20px;font-size:27px;color:var(--ink)}
+.feed .prize{padding:26px 32px}.feed .prize .lab{font-size:22px}.feed .prize .big{font-size:42px;margin:6px 0 12px}.feed .prize .tbd{font-size:22px;padding:4px 12px}
+.feed .foot{margin-top:auto;padding-top:18px}.feed .url{font-size:32px}.feed .hand{font-size:26px;margin-top:6px}.feed .tag{font-size:26px}
+/* ---------- IG story 1080x1920 (text kept inside y 250..1670) ---------- */
+.story{width:1080px;height:1920px;padding:264px 72px 0}
+.story .kick .t{font-size:38px}.story .kick .s{font-size:27px}
+.story h1{font-size:128px;margin:30px 0 12px}
+.story .lede{font-size:31px;margin-bottom:24px}
+.story .slots{gap:10px}
+.story .slot{height:76px;padding:0 26px;gap:20px}.story .slot .k{font-size:33px;width:62px}.story .slot .n{font-size:32px;width:196px}.story .slot .d{font-size:23px}
+.story .rules{gap:10px;margin:26px 0 26px;font-size:30px}
+.story .prize{padding:30px 34px}.story .prize .lab{font-size:24px}.story .prize .big{font-size:46px;margin:8px 0 14px}.story .prize .tbd{font-size:24px;padding:5px 14px}
+.story .foot{margin-top:26px;padding-top:22px}.story .url{font-size:34px}.story .hand{font-size:28px;margin-top:6px}.story .tag{font-size:28px}
+/* ---------- X 1600x900 ---------- */
+.x{width:1600px;height:900px;padding:46px 64px 40px}
+.x .cols{display:grid;grid-template-columns:800px 1fr;gap:44px;flex:1}
+.x .kick .t{font-size:30px}.x .kick .s{font-size:22px}
+.x h1{font-size:108px;margin:18px 0 8px}
+.x .lede{font-size:28px;margin-bottom:18px}
+.x .slots{gap:8px}
+.x .slot{height:62px;padding:0 24px;gap:20px}.x .slot .k{font-size:28px;width:52px}.x .slot .n{font-size:28px;width:170px}.x .slot .d{font-size:20px}
+.x .rules{gap:18px;margin:4px 0 0;font-size:25px}
+.x .prize{padding:30px 34px;flex:1;margin-top:28px;display:flex;flex-direction:column;justify-content:center}.x .prize .lab{font-size:22px}.x .prize .big{font-size:46px;margin:12px 0 20px}.x .prize .tbd{font-size:22px;padding:5px 14px;align-self:flex-start}
+.x .foot{padding-top:16px;margin-top:20px}.x .url{font-size:30px}.x .hand{font-size:24px;margin-top:4px}.x .tag{font-size:24px}
+.x .right{display:flex;flex-direction:column;padding:14px 0 0}
+</style></head><body>
+<template id="kick"><div class="kick"><div class="t">THE FIVE THAT SCORE</div><div class="s">NCAA D1 women's gymnastics · 2027 season starts in January</div></div></template>
+<template id="slots"><div class="slots">
+  <div class="slot"><span class="k">VT</span><span class="n">Vault</span><span class="d">her vault score</span></div>
+  <div class="slot"><span class="k">UB</span><span class="n">Bars</span><span class="d">her bars score</span></div>
+  <div class="slot"><span class="k">BB</span><span class="n">Beam</span><span class="d">her beam score</span></div>
+  <div class="slot"><span class="k">FX</span><span class="n">Floor</span><span class="d">her floor score</span></div>
+  <div class="slot"><span class="k">AA</span><span class="n">All-Around</span><span class="d">every event she competes that meet, added up</span></div>
+</div></template>
+<template id="rules"><ul class="rules">
+  <li><span><b>Any D1 gymnast.</b> Five different teams.</span></li>
+  <li><span><b>New lineup every week.</b> Nothing carries over.</span></li>
+  <li><span><b>Locks Friday 5 PM CT.</b></span></li>
+  <li><span><b>Highest season total wins.</b></span></li>
+</ul></template>
+<template id="prize"><div class="prize"><div class="lab">SEASON PRIZE</div><div class="big">Season winner gets a new leo.<br>Your size, your pick.</div><span class="tbd">Leo: TBD</span></div></template>
+<template id="foot"><div class="foot"><div><div class="url">thefivegym.github.io/fantasy-five</div><div class="hand">@thefivethatscore</div></div><div class="tag">Just the read.</div></div></template>
+<div id="root"></div>
+<script>
+const f = new URLSearchParams(location.search).get('f') || 'feed';
+const T = id => document.getElementById(id).innerHTML;
+const c = document.createElement('div'); c.className = 'c ' + f;
+const head = `${T('kick')}<h1>FANTASY FIVE</h1><div class="lede">5 picks a week. One on each event, plus one All-Around.</div>`;
+c.innerHTML = f === 'x'
+  ? `<div class="cols"><div>${head}${T('slots')}</div><div class="right">${T('rules')}${T('prize')}</div></div>${T('foot')}`
+  : `${head}${T('slots')}${T('rules')}${T('prize')}${T('foot')}`;
+if (f === 'x') c.querySelector('.prize .big').innerHTML = 'Season winner<br>gets a new leo.<br>Your size, your pick.';
+document.getElementById('root').append(c);
+// overflow report for the checker
+const r = c.getBoundingClientRect(), bad = [];
+c.querySelectorAll('*').forEach(e => { const b = e.getBoundingClientRect(); if (b.width && (b.right > r.right + .5 || b.bottom > r.bottom + .5 || e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible')) bad.push(e.className || e.tagName); });
+const txt = [...c.querySelectorAll('.kick,h1,.lede,.slot,.rules li,.prize,.foot')].map(e => e.getBoundingClientRect());
+document.title = JSON.stringify({ f, bad, top: Math.min(...txt.map(b => b.top)), bottom: Math.max(...txt.map(b => b.bottom)), footBottom: c.querySelector('.foot').getBoundingClientRect().bottom, lastAboveFoot: Math.max(...[...c.querySelectorAll('.prize,.rules')].map(e => e.getBoundingClientRect().bottom)), footTop: c.querySelector('.foot').getBoundingClientRect().top });
+</script></body></html>

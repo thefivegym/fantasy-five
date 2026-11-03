@@ -96,3 +96,6 @@ canvas.cardcanvas { width: 100%; max-width: 540px; height: auto; border-radius: 
 .slot.clash { border-color: var(--live); background: color-mix(in srgb, var(--live) 8%, transparent); }
 .slotlab { display: inline-block; min-width: 34px; font-weight: 800; font-size: .78rem; color: var(--muted); letter-spacing: .04em; }
 #board .slot { min-height: 54px; }
+
+/* season prize line on home */
+.prize-line { margin: 12px 0 2px; padding: 10px 14px; border-left: 5px solid var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); border-radius: 8px; font-weight: 600; }
