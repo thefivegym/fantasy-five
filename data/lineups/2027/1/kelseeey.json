@@ -1,0 +1,16 @@
+{
+ "schema": 2,
+ "login": "kelseeey",
+ "season": 2027,
+ "week": 1,
+ "submitted_at": "2026-11-05T17:22:36Z",
+ "issue": 10,
+ "issue_url": "https://github.com/thefivegym/fantasy-five/issues/10",
+ "lineup": {
+  "vault": "addison-fatta",
+  "bars": "chloe-lacoursiere",
+  "beam": "kayla-dicello",
+  "floor": "lily-smith",
+  "aa": "kailin-chio"
+ }
+}
