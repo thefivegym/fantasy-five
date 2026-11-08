@@ -38,11 +38,18 @@ export const REPO = 'thefivegym/fantasy-five';
 export const LINEUP_TITLE_PREFIX = 'Lineup:';
 export const LINEUP_LABEL = 'lineup';
 
-// Players. A lineup is only accepted from a login with data/players/<login>.json (see signup.html).
+// Players. A GitHub lineup is only accepted from a login with data/players/<login>.json
+// whose auth is not "instagram" (see signup.html and scripts/process-lineup.mjs).
+// Handle-only signups are a different id: the normalized Instagram handle, never REPO_OWNER.
 export const SIGNUP_LABEL = 'signup';
 export const SIGNUP_TITLE_PREFIX = 'Signup:';
 export const SITE = 'https://thefivegym.github.io/fantasy-five';
 export const SIGNUP_URL = `${SITE}/signup.html`;
+export const REPO_OWNER = REPO.split('/')[0];
+// Browser origins allowed to POST a handle. Localhost is added only by the dev server.
+export const SIGNUP_ORIGINS = ['https://thefivegym.github.io'];
+// Abuse caps for the save service. Over the cap, or if the store is missing, nothing is saved.
+export const SIGNUP_LIMITS = { perIp: 15, global: 40, windowSec: 3600 };
 // Sign-up stores the player's Instagram handle (plain text, public) so the organizer can DM the winner.
 
 // Weekly reminder issue: Wednesday 10:00 AM America/Chicago before the Friday lock.

@@ -46,10 +46,14 @@ FF.chrome('');
   const sid = String(s.season);
   const lb = await FF.json(`data/leaderboard/${sid}.json`, { weeks: [], players: [] });
   const me = lb.players.find(p => p.login.toLowerCase() === u.toLowerCase());
-  const ig = FF.igOf(await FF.players(), me?.login || u);
+  const P = await FF.players();
+  const ig = FF.igOf(P, me?.login || u);
+  const prec = P[me?.login || u] || Object.entries(P).find(([k]) => k.toLowerCase() === String(me?.login || u).toLowerCase())?.[1];
   $('title').innerHTML = `${FF.esc(me?.login || u)} ${ig ? `<span class="sub" style="font-size:.8em">${FF.igLink(ig)}</span>` : ''} ${FF.isDemo(s) ? '<span class="demo-tag">DEMO</span>' : ''}`;
   document.title = `${me?.login || u} — Fantasy Five`;
-  const gh = FF.isDemoLogin(u) ? '<span class="sub">Sample DEMO player, not a GitHub account.</span>' : `<a href="https://github.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">github.com/${FF.esc(u)}</a>`;
+  const gh = FF.isDemoLogin(u) ? '<span class="sub">Sample DEMO player, not a GitHub account.</span>'
+    : prec?.auth === 'instagram' ? '<span class="sub">Signed up with a public Instagram handle. Owning that account is not verified.</span>'
+    : `<a href="https://github.com/${encodeURIComponent(u)}" target="_blank" rel="noopener">github.com/${FF.esc(u)}</a>`;
   if (!me) { $('summary').innerHTML = `<p>No scored weeks for ${FF.esc(u)} in ${FF.isDemo(s) ? 'the DEMO' : sid}. ${gh}</p>`; return; }
   $('summary').innerHTML = `<div class="kpi"><div><div class="sub">Season total</div><div class="big">${FF.fTot(me.total)}</div></div><div><div class="sub">Season rank</div><div class="big">${me.rank}<span class="sub"> / ${lb.players.length}</span></div></div><div><div class="sub">Best week</div><div class="big">${FF.fTot(me.best_week?.total)}</div></div></div><p>${gh}</p>`;
   const rows = [];

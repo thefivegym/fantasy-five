@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Processes a sign-up (or reminders on/off) submitted as a GitHub issue from signup.html.
+// Processes a sign-up (or reminders on/off) submitted as a GitHub issue.
+// signup.html no longer opens these issues. Handle-only signups are saved by workers/signup.
 // Issue body JSON:
 //   sign up / update: {"game":"fantasy-five","type":"signup","schema":2,"reminders":true,"instagram":"handle"}
 //   reminders only:   {"game":"fantasy-five","type":"reminders","schema":2,"reminders":false}
@@ -8,7 +9,7 @@ import { readFile, appendFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DATA, writeJson } from './lib/io.mjs';
 import { SIGNUP_LABEL, SIGNUP_TITLE_PREFIX, SIGNUP_URL, SITE } from './lib/config.mjs';
-import { loadPlayer, playerPath, writePlayersIndex } from './lib/players.mjs';
+import { loadPlayer, loadPlayers, playerPath, writePlayersIndex } from './lib/players.mjs';
 import { checkInstagram } from './lib/instagram.mjs';
 import { extractJson } from './process-lineup.mjs';
 
@@ -20,7 +21,7 @@ export function isSignupIssue(issue) {
   return (issue.labels || []).some(l => (l.name || l) === SIGNUP_LABEL) || (issue.title || '').startsWith(SIGNUP_TITLE_PREFIX);
 }
 
-export async function processSignup({ issue, now, existing }) {
+export async function processSignup({ issue, now, existing, players = [] }) {
   const login = issue.user.login;
   const data = extractJson(issue.body);
   if (!data) return { ok: false, login, errors: [`No sign-up JSON found. Use ${SIGNUP_URL}.`] };
@@ -29,13 +30,20 @@ export async function processSignup({ issue, now, existing }) {
   if (typeof data.reminders !== 'boolean') errors.push('reminders must be true or false.');
   const extra = Object.keys(data).filter(k => !['game', 'type', 'schema', 'reminders', 'instagram'].includes(k));
   if (extra.length) errors.push(`Unknown keys: ${extra.join(', ')}.`);
+  const locked = existing?.auth === 'instagram';
   let rec;
   if (data.type === 'signup') {
     const ig = checkInstagram(data.instagram);
     if (!ig.ok) errors.push(ig.error);
+    if (locked) errors.push(`@${login} is a handle-only signup and cannot be changed from a GitHub issue.`);
+    if (ig.ok) {
+      const taken = players.find(p => String(p.instagram || '').toLowerCase() === ig.handle && String(p.login).toLowerCase() !== String(login).toLowerCase());
+      if (taken) errors.push(`Instagram @${ig.handle} is already signed up.`);
+    }
     if (errors.length) return { ok: false, login, errors };
     rec = { login, instagram: ig.handle, joined_at: existing?.joined_at || now, reminders: data.reminders };
   } else if (data.type === 'reminders') {
+    if (locked) errors.push(`@${login} is a handle-only signup and cannot be changed from a GitHub issue.`);
     if (!existing) errors.push(`No sign-up on file for @${login}. Sign up first: ${SIGNUP_URL}.`);
     if (data.instagram !== undefined) errors.push('A reminders change takes no handle. Sign up again to change it.');
     if (errors.length) return { ok: false, login, errors };
@@ -62,10 +70,11 @@ async function main() {
   const out = async (k, v) => process.env.GITHUB_OUTPUT && appendFile(process.env.GITHUB_OUTPUT, `${k}=${v}\n`);
   if (!issue || !isSignupIssue(issue)) { console.log('Not a sign-up issue; skipping.'); await out('skip', 'true'); return; }
   console.log(`Event: ${ev.action}; issue ${issue.state}; changed: ${Object.keys(ev.changes || {}).join(',') || 'none'}`);
-  // A closed sign-up issue is done. Signing up again is a new issue from signup.html.
+  // A closed sign-up issue is done. Signing up again is a new issue, not an edit of a closed one.
   if (issue.state === 'closed') { console.log('Issue is closed; skipping.'); await out('skip', 'true'); return; }
   const existing = await loadPlayer(issue.user.login);
-  const res = await processSignup({ issue, now: new Date().toISOString(), existing });
+  const players = await loadPlayers();
+  const res = await processSignup({ issue, now: new Date().toISOString(), existing, players });
   if (res.ok) { await writeJson(join(DATA, '..', res.path), res.record); await writePlayersIndex(); console.log(`Saved ${res.path}`); }
   else console.log('Rejected:\n' + res.errors.join('\n'));
   await writeFile(COMMENT_FILE, signupComment(res) + '\n');
