@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// Weekly lineup reminder. Opens one GitHub issue per week before the lock that @mentions every player with
-// reminders: true (GitHub then emails them per their notification settings), and closes last week's reminder.
+// Weekly lineup reminder. Opens one GitHub issue per week before the lock that @mentions every GitHub-account
+// player with reminders: true (GitHub then emails them per their notification settings). Handle-only signups
+// (auth "instagram") are skipped: an @mention would hit a different GitHub account, and no email is on file.
+// Closes last week's reminder.
 // Usage:
 //   node scripts/remind.mjs --dry-run            print what would be posted (mentions shown as @\u200blogin, nobody notified)
 //   node scripts/remind.mjs                      post (needs GH_TOKEN, GITHUB_REPOSITORY); only acts at 10 AM CT Wednesday
@@ -27,6 +29,11 @@ export function isReminderHour(now = Date.now()) {
 }
 export const reminderTitle = (season, w) => `Week ${w.week} lineups lock ${lockShort(w.lock)}`;
 
+/** GitHub logins to mention. Handle-only players are omitted so their Instagram name is not @mentioned. */
+export function reminderLogins(players) {
+  return players.filter(p => p.reminders === true && p.auth !== 'instagram').map(p => p.login).sort((a, b) => a.localeCompare(b));
+}
+
 /** Issue body + follow-up comments, each with at most MENTIONS_PER_COMMENT mentions. */
 export function reminderBodies(season, w, logins, { dryRun = false, per = MENTIONS_PER_COMMENT } = {}) {
   const at = l => (dryRun ? `@\u200b${l}` : `@${l}`);
@@ -36,7 +43,7 @@ export function reminderBodies(season, w, logins, { dryRun = false, per = MENTIO
     '',
     `Locks ${lock}. Build it: ${SITE}/build.html`,
     '',
-    `You get this because you signed up with reminders on. Turn them off: ${SITE}/signup.html`,
+    `You get this GitHub mention because your GitHub sign-up has reminders on. Handle-only signups are not mentioned and are not emailed. The sign-up page cannot change an existing registration.`,
   ].join('\n');
   const batches = [];
   for (let i = 0; i < logins.length; i += per) batches.push(logins.slice(i, i + per));
@@ -61,7 +68,7 @@ async function main() {
   if (!dry && !force && !isReminderHour(now)) { console.log(`Not ${REMINDER_LOCAL.weekday} ${REMINDER_LOCAL.hour}:00 CT (this is the other DST cron). Skipping.`); return; }
   const w = reminderWeek(season, now);
   if (!w) { console.log('No week locks in the next 7 days (offseason or between seasons). Nothing to send.'); return; }
-  const players = (await loadPlayers()).filter(p => p.reminders === true).map(p => p.login).sort((a, b) => a.localeCompare(b));
+  const players = reminderLogins(await loadPlayers());
   const title = reminderTitle(season, w);
   const { body, comments } = reminderBodies(season, w, players, { dryRun: dry });
   if (dry) {

@@ -29,52 +29,62 @@
 <script src="assets/common.js"></script>
 </head>
 <body>
-<body>
 <main class="wrap">
   <div id="banner" class="banner" hidden></div>
   <h2>Sign up</h2>
-  <p class="sub">Once per season, before your first lineup. A lineup from a GitHub login with no sign-up is not accepted. Your GitHub login is your player name.</p>
+  <p class="sub">Enter your public Instagram handle and submit it here. No GitHub account. No email. No password.</p>
   <section class="card">
-    <h3>Instagram and reminders</h3>
+    <h3>Instagram handle</h3>
     <form id="f" novalidate>
       <label class="field"><span>Instagram handle <b>(required)</b></span>
-        <input type="text" id="ig" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="80" placeholder="@yourhandle"></label>
+        <input type="text" id="ig" name="instagram" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="80" placeholder="@yourhandle"></label>
+      <p class="hp"><label>Fax<input id="fax" name="fax" tabindex="-1" autocomplete="off" aria-hidden="true"></label></p>
       <p class="sub" id="igprev"></p>
-      <label class="check"><input type="checkbox" id="rem" checked> Weekly reminder to fill my lineup (Wednesday 10 AM CT, before the Friday lock)</label>
-      <p class="sub" id="err" role="alert"></p>
-      <button class="btn primary" id="go" type="submit">Open GitHub issue</button>
+      <p id="err" class="sub" role="status" aria-live="polite"></p>
+      <button class="btn primary" id="go" type="submit">Submit</button>
     </form>
-    <p class="sub"><b>Your IG handle is public on the leaderboard. It's how we contact weekly winners.</b> A handle or instagram.com link both work; it's saved lowercase, letters, digits, . and _ only, up to 30 characters.</p>
-    <p class="sub">Then press <b>Create</b> on GitHub. A bot saves your sign-up, comments, and closes the issue within a minute or two. Signing up again replaces your handle and reminder setting.</p>
-    <p class="sub"><b>Reminders arrive as a GitHub mention. Check your GitHub email notifications are on</b> (GitHub → Settings → Notifications → Email for participating and @mentions).</p>
-  </section>
-  <section class="card">
-    <h3>Reminders only</h3>
-    <p class="sub">Already signed up? Change reminders without re-entering your handle.</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" id="off" href="#">Turn reminders off</a><a class="btn" id="on" href="#">Turn reminders on</a></div>
+    <p class="sub"><b>Your IG handle is public on the leaderboard. It's how we contact weekly winners.</b> Submitting it does not verify that you own the account.</p>
+    <p class="sub">A handle or an instagram.com link both work. It's stored lowercase: letters, digits, periods, and underscores, up to 30 characters, with at least one letter or digit.</p>
+    <p class="sub"><b>Weekly reminders are GitHub mentions.</b> This signup has no GitHub account, so it does not send a reminder and it does not send email. Check the site for the Friday lock.</p>
+    <p class="sub">A lineup is still filed from Build lineup with GitHub. This page only saves the handle. It can't change a signup that's already on file, and it can't edit a lineup.</p>
   </section>
 </main>
 <script>
 (async () => {
   FF.chrome('signup.html');
   const $ = id => document.getElementById(id);
-  const issueUrl = (title, intro, payload) => `https://github.com/${FF.REPO}/issues/new?labels=signup&title=${encodeURIComponent(title)}&body=${encodeURIComponent(`<!-- ${intro} Press "Create". Don't edit the JSON block. -->\n${intro}\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`\n`)}`;
-  for (const [id, on] of [['off', false], ['on', true]])
-    $(id).href = issueUrl(`Signup: reminders ${on ? 'on' : 'off'}`, `Fantasy Five: reminders ${on ? 'on' : 'off'}.`, { game: 'fantasy-five', type: 'reminders', schema: 2, reminders: on });
-  const { checkInstagram } = await import(new URL('scripts/lib/instagram.mjs', location.href).href);
-  /** Exposed for the test harness: returns the issue URL for a handle + reminder choice, or throws the error. */
-  window.ffSignupUrl = (raw, reminders) => {
-    const c = checkInstagram(raw); if (!c.ok) throw new Error(c.error);
-    return issueUrl('Signup: Fantasy Five player', `Fantasy Five sign-up. IG: @${c.handle}. Reminders ${reminders ? 'on' : 'off'}.`,
-      { game: 'fantasy-five', type: 'signup', schema: 2, reminders, instagram: c.handle });
+  const { prepareSignup, interpretSignup, checkInstagram, UNCONFIGURED, NETWORK } = await import(new URL('scripts/lib/signup-form.mjs', location.href).href);
+  const cfg = await FF.json('data/signup-api.json', { url: '' });
+  const api = typeof cfg.url === 'string' ? cfg.url : '';
+  if (!api.trim()) {
+    const b = $('banner');
+    b.hidden = false;
+    b.textContent = UNCONFIGURED + ' Saving stays off until the organizer sets the signup address. Nothing is stored in this browser.';
+  }
+  const show = (ok, message) => {
+    $('err').classList.toggle('ok', !!ok);
+    $('err').textContent = message;
+    if ($('igprev').textContent === message) $('igprev').textContent = '';
   };
-  $('ig').addEventListener('input', () => { const c = checkInstagram($('ig').value); $('igprev').textContent = $('ig').value.trim() ? (c.ok ? `Saved as @${c.handle}` : c.error) : ''; });
-  $('f').addEventListener('submit', e => {
-    e.preventDefault();
+  $('ig').addEventListener('input', () => {
     const c = checkInstagram($('ig').value);
-    if (!c.ok) { $('err').textContent = c.error; $('ig').focus(); return; }
-    $('err').textContent = '';
-    location.href = window.ffSignupUrl(c.handle, $('rem').checked);
+    $('igprev').textContent = $('ig').value.trim() ? (c.ok ? `Will submit as @${c.handle}` : c.error) : '';
+  });
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if ($('fax').value) { show(false, 'Sign-up was not saved.'); return; }
+    const prep = prepareSignup(api, $('ig').value);
+    if (!prep.ok) { show(false, prep.message); $('ig').focus(); return; }
+    $('go').disabled = true;
+    show(false, 'Saving…');
+    try {
+      const r = await fetch(prep.url, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(prep.body) });
+      let body = null;
+      try { body = await r.json(); } catch { body = null; }
+      const out = interpretSignup(r.status, body, prep.handle);
+      show(out.ok, out.message);
+    } catch { show(false, NETWORK); }
+    finally { $('go').disabled = false; }
   });
 })().catch(e => { const b = document.getElementById('banner'); b.hidden = false; b.className = 'banner err'; b.textContent = 'Could not load: ' + e.message; });
 </script>

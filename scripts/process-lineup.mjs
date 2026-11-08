@@ -31,13 +31,23 @@ export function isLineupIssue(issue) {
 
 const fmtCT = iso => new Date(iso).toLocaleString('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' CT';
 
+/** GitHub issue lineups count only for a GitHub-account signup. Handle-only records are not that login. */
+export function githubLineupAllowed(record) {
+  return !!record && record.auth !== 'instagram';
+}
+
 /** Core decision. Returns { ok, errors[], record?, path?, week? } */
-export async function processSubmission({ issue, action, now, hasPlayer = async login => !!(await loadPlayer(login)) }) {
+export async function processSubmission({ issue, action, now, hasPlayer, readPlayer = loadPlayer }) {
   const submittedAt = action === 'edited' ? (issue.updated_at || now) : (issue.created_at || now);
   const data = extractJson(issue.body);
   if (!data) return { ok: false, errors: ['No lineup JSON found in the issue body. Build the lineup at https://thefivegym.github.io/fantasy-five/build.html and submit from there.'] };
   const errors = [];
-  if (!(await hasPlayer(issue.user.login))) return { ok: false, errors: [`Sign up first: ${SIGNUP_URL}. Then submit the lineup again.`] };
+  let loaded = null;
+  const allowed = hasPlayer ? await hasPlayer(issue.user.login) : githubLineupAllowed(loaded = await readPlayer(issue.user.login));
+  if (!allowed) {
+    if (loaded?.auth === 'instagram') return { ok: false, errors: ['This GitHub login matches a handle-only signup and cannot file its lineup. Nothing was saved.'] };
+    return { ok: false, errors: [`Sign up first: ${SIGNUP_URL}. Then submit the lineup again.`] };
+  }
   let season;
   try { season = await loadSeason(data.season); } catch { return { ok: false, errors: [`Season ${JSON.stringify(data.season)} does not exist.`] }; }
   const week = season.weeks.find(w => Number(w.week) === Number(data.week));

@@ -16,5 +16,7 @@ export function checkInstagram(raw) {
   if (!handle) return { ok: false, error: 'Instagram handle is required.' };
   if (handle.length > IG_MAX) return { ok: false, error: `Instagram handle is ${handle.length} characters. Max ${IG_MAX}.` };
   if (!IG_RE.test(handle)) return { ok: false, error: 'Instagram handles use only letters, digits, . and _.' };
+  if (!/[a-z0-9]/.test(handle)) return { ok: false, error: 'Instagram handle must include a letter or digit.' };
+  if (handle.startsWith('.') || handle.endsWith('.') || handle.includes('..')) return { ok: false, error: 'Instagram handles cannot start or end with a period, or use two periods in a row.' };
   return { ok: true, handle };
 }

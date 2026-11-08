@@ -1,0 +1,12 @@
+# Fantasy Five handle-only signup. Deploy steps are in the README.
+# Do not put SIGNUP_GITHUB_TOKEN in this file. Set it with:
+#   npx wrangler secret put SIGNUP_GITHUB_TOKEN
+name = "fantasy-five-signup"
+main = "index.mjs"
+compatibility_date = "2024-12-01"
+
+# npx wrangler kv namespace create SIGNUP_KV
+# Paste the printed id below. A missing or placeholder id will not save signups.
+[[kv_namespaces]]
+binding = "SIGNUP_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

@@ -8,10 +8,11 @@
 //   node scripts/admin/winner.mjs --season=demo       pick the season (default: data/season.json season)
 //   node scripts/admin/winner.mjs --standings         season standings (bragging rights, no prize)
 //   node scripts/admin/winner.mjs --players           every signed-up player: login, IG, reminders
+//   node scripts/admin/winner.mjs --players --since=YYYY-MM-DD   only players who joined at or after that UTC time
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { DATA, readJson, parseArgs } from '../lib/io.mjs';
-import { loadPlayers, loadPlayer } from '../lib/players.mjs';
+import { loadPlayers, loadPlayer, playersJoinedSince } from '../lib/players.mjs';
 import { WEEKLY_PRIZE_CENTS } from '../lib/config.mjs';
 import { splitPrize, usd } from '../lib/scoring.mjs';
 
@@ -26,7 +27,9 @@ export async function scoredWeeks(sid) {
 }
 
 if (a.players) {
-  const ps = await loadPlayers();
+  let ps;
+  try { ps = playersJoinedSince(await loadPlayers(), a.since); }
+  catch (e) { console.error(e.message); process.exit(1); }
   if (!ps.length) console.log('No signed-up players.');
   for (const p of ps) console.log(`${p.login}\t${ig(p.instagram)}\treminders=${p.reminders}`);
 } else if (a.standings) {

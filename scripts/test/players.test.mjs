@@ -19,6 +19,10 @@ test('Instagram handle: normalize and validate', () => {
   assert.deepEqual(checkInstagram('a'.repeat(31)), { ok: false, error: 'Instagram handle is 31 characters. Max 30.' });
   assert.equal(checkInstagram('a'.repeat(30)).ok, true);
   for (const bad of ['jane doe', 'jane-doe', 'jané', 'jane!']) assert.deepEqual(checkInstagram(bad), { ok: false, error: 'Instagram handles use only letters, digits, . and _.' }, bad);
+  assert.deepEqual(checkInstagram('...'), { ok: false, error: 'Instagram handle must include a letter or digit.' });
+  assert.deepEqual(checkInstagram('.ab'), { ok: false, error: 'Instagram handles cannot start or end with a period, or use two periods in a row.' });
+  assert.deepEqual(checkInstagram('ab.'), { ok: false, error: 'Instagram handles cannot start or end with a period, or use two periods in a row.' });
+  assert.deepEqual(checkInstagram('a..b'), { ok: false, error: 'Instagram handles cannot start or end with a period, or use two periods in a row.' });
 });
 
 test('sign-up: record {login, instagram, joined_at, reminders}; update; reminders only', async () => {
